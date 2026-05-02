@@ -1,0 +1,126 @@
+{
+  "fecha": "2 de mayo de 2026",
+  "variables": {
+    "gini": {
+      "valor": 0.43,
+      "fuente": "Banco Mundial/CEIC Data",
+      "tipo_fuente": "oficial",
+      "fecha": "2024",
+      "nota": "El Banco Mundial reportó un Gini de 0.43 para Chile en 2024, lo que representa una disminución desde 0.432 en 2022"
+    },
+    "costo": {
+      "valor": 64,
+      "fuente": "Encuesta Ipsos",
+      "tipo_fuente": "encuesta",
+      "fecha": "Octubre 2025",
+      "nota": "64% de chilenos dice que le cuesta llegar a fin de mes financieramente, muy por encima del promedio mundial de 37%"
+    },
+    "desempleo": {
+      "valor": 8.9,
+      "fuente": "INE Chile",
+      "tipo_fuente": "oficial",
+      "fecha": "Enero-Marzo 2026",
+      "nota": "Tasa de desocupación INE para trimestre enero-marzo 2026, con aumento de 0.2pp respecto año anterior"
+    },
+    "conf_gob": {
+      "valor": 42,
+      "fuente": "Cadem Plaza Pública",
+      "tipo_fuente": "encuesta",
+      "fecha": "Abril 2026",
+      "nota": "Aprobación del Presidente Kast en encuesta Cadem abril 2026, con caída de 2pts respecto medición anterior"
+    },
+    "conf_cong": {
+      "valor": 32,
+      "fuente": "Cadem",
+      "tipo_fuente": "encuesta",
+      "fecha": "Octubre 2024",
+      "nota": "Confianza en el Congreso históricamente baja según encuestas Cadem, con 90% insatisfecho con sistema político (2024)"
+    },
+    "movilizacion": {
+      "valor": 5.8,
+      "fuente": "Medios nacionales",
+      "tipo_fuente": "media",
+      "fecha": "Mayo 2026",
+      "nota": "Movilizaciones del 1° de mayo 2026 multitudinarias con participación nacional, protestas estudiantiles marzo, y actividad sindical moderada pero constante"
+    },
+    "abuso": {
+      "valor": 72,
+      "fuente": "Encuesta USS",
+      "tipo_fuente": "encuesta",
+      "fecha": "Marzo 2025",
+      "nota": "72% percibe amenaza del crimen organizado en vida diaria, baja evaluación de Carabineros (44.7%) y PDI (44.1%)"
+    },
+    "frag": {
+      "valor": 8.4,
+      "fuente": "Análisis Congreso 2026",
+      "tipo_fuente": "oficial",
+      "fecha": "2026",
+      "nota": "14 partidos en la Cámara de Diputados 2026 con distribución: PR 28, FA 15, PDG 14, RN 11, PS 10, PC 8, PNL 8, DC 7, otros menores"
+    }
+  },
+  "fuentes_usadas": [
+    {
+      "variable": "gini",
+      "nombre": "CEIC Data/Banco Mundial",
+      "tipo": "oficial",
+      "espectro": "neutro",
+      "fecha": "2024"
+    },
+    {
+      "variable": "costo",
+      "nombre": "Ipsos Global",
+      "tipo": "encuesta",
+      "espectro": "neutro",
+      "fecha": "Octubre 2025"
+    },
+    {
+      "variable": "desempleo",
+      "nombre": "INE Chile",
+      "tipo": "oficial",
+      "espectro": "neutro",
+      "fecha": "Abril 2026"
+    },
+    {
+      "variable": "conf_gob",
+      "nombre": "Cadem Plaza Pública",
+      "tipo": "encuesta",
+      "espectro": "centro",
+      "fecha": "Abril 2026"
+    },
+    {
+      "variable": "conf_cong",
+      "nombre": "Cadem",
+      "tipo": "encuesta",
+      "espectro": "centro",
+      "fecha": "Octubre 2024"
+    },
+    {
+      "variable": "movilizacion",
+      "nombre": "Múltiples medios",
+      "tipo": "media",
+      "espectro": "neutro",
+      "fecha": "Mayo 2026"
+    },
+    {
+      "variable": "abuso",
+      "nombre": "USS/Cescro",
+      "tipo": "encuesta",
+      "espectro": "neutro",
+      "fecha": "Marzo 2025"
+    },
+    {
+      "variable": "frag",
+      "nombre": "Congreso Nacional",
+      "tipo": "oficial",
+      "espectro": "neutro",
+      "fecha": "2026"
+    }
+  ],
+  "fuentes_editoriales": {
+    "derecha": 3,
+    "centro": 4,
+    "izquierda": 2
+  },
+  "coeficiente": 0.5,
+  "fecha_iso": "02-05-2026"
+}
