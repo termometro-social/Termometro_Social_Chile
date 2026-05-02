@@ -451,7 +451,7 @@ function shareWhatsApp() {
 
 /* ─── CARGAR DATOS ─── */
 async function cargarDatos() {
-  const BASE = 'https://termometro-social.github.io/termometro-social';
+const BASE = 'https://termometro-social.github.io/termometro_social';
   try {
     const [rCoef, rHist] = await Promise.all([
       fetch(`${BASE}/data/coeficiente.json?t=${Date.now()}`),
