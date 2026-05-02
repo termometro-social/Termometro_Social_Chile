@@ -513,13 +513,13 @@ function shareWhatsApp(coef){
     `${diff>=0?'⬆':'⬇'} ${Math.abs((diff/0.847)*100).toFixed(1)}% ${diff>=0?'más cerca':'más lejos'} del 18-O 2019\n\n`+
     `"${nivel.desc}"\n\n`+
     `📡 _Datos en tiempo real · Fuentes de diverso espectro editorial_\n`+
-    `🔗 https://termometro-social.github.io/termometro_social\n`+
+    `🔗 https://www.termometrosocial.cl\n`+
     `_Escala: 0 = democracia estable · 1 = estallido social_`;
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
 
 async function cargarDatos(){
-  const BASE='https://termometro-social.github.io/termometro_social';
+  const BASE='https://www.termometrosocial.cl';
   try{
     const[rCoef,rHist]=await Promise.all([
       fetch(`${BASE}/data/coeficiente.json?t=${Date.now()}`),
