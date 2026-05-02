@@ -1,0 +1,1 @@
+# Termometro_Social_Chile
