@@ -1,30 +1,25 @@
 name: Actualizar Termómetro Social Chile
-
 on:
   schedule:
-    - cron: '0 11 * * *'  # 08:00 AM Chile (UTC-3) = 11:00 UTC
+    - cron: '0 11 * * *'  # 08:00 AM Chile horario verano (UTC-3)
+    - cron: '0 12 * * *'  # 08:00 AM Chile horario invierno (UTC-4)
   workflow_dispatch:        # permite ejecutar manualmente desde GitHub
-
 permissions:
   contents: write
-
 jobs:
   actualizar:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
-
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Ejecutar script de actualización
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node scripts/actualizar.mjs
-
       - name: Guardar datos actualizados en GitHub
         run: |
           git config user.name "Termómetro Bot"
