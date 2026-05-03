@@ -3,5 +3,10 @@
     "fecha": "2 de mayo de 2026",
     "fecha_iso": "02-05-2026",
     "coeficiente": 0.5
+  },
+  {
+    "fecha": "3 de mayo de 2026",
+    "fecha_iso": "03-05-2026",
+    "coeficiente": 0.487
   }
 ]
