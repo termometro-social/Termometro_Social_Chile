@@ -708,7 +708,16 @@ function renderSismo(coef){
   const svg=document.getElementById('sismoSvg');
   const W=260,H=110,pL=26,pR=32,pT=14,pB=18;
   const iW=W-pL-pR,iH=H-pT-pB;
-  const pts=genFakeData(currentZoom);
+  /* Usar historial real si está disponible, si no datos ficticios */
+  let pts;
+  if(historialReal && historialReal.length>=2){
+    const slice = historialReal.slice(-currentZoom);
+    pts = slice.map(d=>parseFloat(d.coeficiente));
+    /* Si hay menos puntos que el zoom, completar con el primero */
+    while(pts.length<2) pts.unshift(pts[0]);
+  } else {
+    pts = genFakeData(currentZoom);
+  }
   const n=pts.length;
   const xS=i=>pL+i*(iW/(n-1));
   const yS=v=>pT+iH-(v*iH);
@@ -902,8 +911,59 @@ document.getElementById('btnShare').onclick=()=>{
 
 /* ── INIT ── */
 buildVarTable();
-const{coef:c0,detalle:d0}=calcular();
-updatePortada(c0,d0,false);
+
+/* Carga datos reales desde data/coeficiente.json y data/historial.json */
+async function cargarDatosReales(){
+  try{
+    /* 1. Cargar coeficiente actual */
+    const res = await fetch('data/coeficiente.json?t='+Date.now());
+    if(!res.ok) throw new Error('No se pudo leer coeficiente.json');
+    const data = await res.json();
+
+    /* Actualizar variables con los valores reales */
+    const keyMap={gini:'gini',costo:'costo',desempleo:'desempleo',conf_gob:'conf_gob',conf_cong:'conf_cong',movilizacion:'movilizacion',abuso:'abuso',frag:'frag'};
+    Object.entries(keyMap).forEach(([jsonKey,varId])=>{
+      const dato = data.variables?.[jsonKey];
+      if(!dato||dato.valor==null) return;
+      const v = VARIABLES.find(x=>x.id===varId);
+      if(!v) return;
+      let val = parseFloat(dato.valor);
+      if(isNaN(val)) return;
+      val = Math.min(v.max, Math.max(v.min, val));
+      valores[varId] = val;
+      fuentes[varId] = dato.fuente ? `${dato.fuente}${dato.fecha?' — '+dato.fecha:''}` : null;
+    });
+
+    /* Calcular con valores reales y mostrar */
+    const{coef,detalle}=calcular();
+    updatePortada(coef,detalle,true);
+
+    /* Actualizar fecha en el kicker con la del JSON */
+    if(data.fecha){
+      document.getElementById('kickerUpdated').textContent='Datos al: '+data.fecha;
+    }
+
+    /* 2. Cargar historial para el sismógrafo */
+    try{
+      const resH = await fetch('data/historial.json?t='+Date.now());
+      if(resH.ok){
+        historialReal = await resH.json();
+        renderSismo(coef);
+      }
+    }catch(e){/* historial no disponible, usa datos ficticios */}
+
+  }catch(err){
+    /* Si falla la carga (ej. desarrollo local), usa valores de referencia 2019 */
+    console.warn('Usando valores de referencia 2019:', err.message);
+    const{coef:c0,detalle:d0}=calcular();
+    updatePortada(c0,d0,false);
+  }
+}
+
+/* Variable global para historial real */
+let historialReal = null;
+
+cargarDatosReales();
 </script>
 </body>
 </html>
