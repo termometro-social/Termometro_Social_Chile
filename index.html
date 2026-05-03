@@ -112,15 +112,12 @@ body{
   gap:10px;
   align-items:stretch;
 }
-/* En pantallas pequeñas (<520px): termómetro arriba, luego escala y sismo en fila */
-@media(max-width:520px){
-  .main-panel{
-    grid-template-columns:1fr 1fr;
-    grid-template-rows:auto auto;
-  }
-  .thermo-box{grid-column:1/3;grid-row:1}
-  .scale-box{height:100%;grid-column:1;grid-row:2}
-  .sismo-box{height:100%;grid-column:2;grid-row:2}
+/* En móvil: 3 columnas apiladas verticalmente en orden */
+@media(max-width:600px){
+  .main-panel{grid-template-columns:1fr;grid-template-rows:auto auto auto;align-items:start}
+  .thermo-box{grid-column:1;grid-row:1;min-height:auto}
+  .scale-box{grid-column:1;grid-row:2;height:auto}
+  .sismo-box{grid-column:1;grid-row:3;height:auto}
 }
 
 /* ══ CAJA TERMÓMETRO ══ */
