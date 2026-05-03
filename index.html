@@ -3,544 +3,907 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta name="description" content="Termómetro Social Chile — Índice diario de tensión social. 0 = democracia estable · 1 = estallido social.">
-<title>Termómetro Social · Chile</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<meta name="description" content="Termómetro Social Chile 2026 — Índice de tensión social basado en el 18-O 2019">
+<title>Termómetro Social · Chile 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #050508;
-  --surface: #0d0d12;
-  --surface2: #12121a;
-  --border: #1e1e2e;
-  --border2: #2a2a3e;
-  --text: #e8e8f0;
-  --muted: #b0b0c8;
-  --dim: #6a6a8e;
-  --red: #ff3b4e;
-  --orange: #ff7b3a;
-  --yellow: #f5c842;
-  --green: #3ddc84;
-  --blue: #3d9aff;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Paleta imagen 1 — café oscuro cálido */
+  --header:#111111;
+  --header2:#1e1e1e;
+  --header3:#2a2a2a;
+  --bg:#fdf9f2;
+  --bg2:#f5edd8;
+  --bg3:#ede0c4;
+  --ink:#111111;
+  --ink2:#2a2a2a;
+  --ink3:#555555;
+  --rule:#cccccc;
+  --rule2:#e0e0e0;
+  --accent:#F2A922;   /* naranja dorado — acento principal */
+  --accent2:#8C641B;  /* café dorado — acento secundario */
+
+  /* Escala clásica rojo→naranja→amarillo→verde */
+  --n0:#1a7a4a;  /* Democracia estable — verde */
+  --n1:#4a9e5c;  /* Estabilidad frágil — verde medio */
+  --n2:#e8a020;  /* Alerta moderada — amarillo naranja */
+  --n3:#e06010;  /* Tensión elevada — naranja */
+  --n4:#cc2200;  /* Crisis social alta — rojo oscuro */
+  --n5:#e82020;  /* Estallido social — rojo */
+
+  --serif:'Libre Baskerville',Georgia,serif;
+  --sans:'Source Sans 3',system-ui,sans-serif;
+  --text-xs:11px;
+  --text-sm:13px;
+  --text-base:15px;
+  --text-md:17px;
+  --text-lg:20px;
+  --text-xl:26px;
 }
-html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:var(--text-base);line-height:1.65;
+  min-height:100vh;overflow-x:hidden;
+}
 
-.header { position: relative; padding: 32px 20px 24px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #0d0d18 0%, var(--bg) 100%); }
-.header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent 0%, var(--red) 30%, var(--orange) 50%, var(--red) 70%, transparent 100%); }
-.header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.header-label { font-size: 12px; color: var(--muted); letter-spacing: 3px; }
-.live-dot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--green); letter-spacing: 1px; }
-.live-dot::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: livePulse 2s ease-in-out infinite; }
-@keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.6)} }
-.header h1 { font-family: 'Fraunces', serif; font-size: clamp(34px, 9vw, 52px); font-weight: 900; color: #fff; line-height: 1; letter-spacing: -1px; }
-.header h1 em { font-style: italic; color: var(--red); font-weight: 300; }
-.header-sub { color: var(--muted); font-size: 14px; margin-top: 8px; line-height: 1.8; }
-.ref-pill { display: inline-flex; align-items: center; gap: 6px; background: #1a0e08; border: 1px solid #f5c84233; border-radius: 20px; padding: 6px 14px; color: var(--yellow); font-size: 13px; margin-top: 10px; }
+/* ══ EN VIVO ══ */
+.en-vivo{display:flex;align-items:center;gap:6px;font-size:var(--text-xs);font-weight:700;letter-spacing:1.5px;color:#4ade80;font-family:var(--sans)}
+.en-vivo-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:livePulse 1.4s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.5)}50%{opacity:0.6;box-shadow:0 0 0 5px rgba(34,197,94,0)}}
 
-.hero { margin: 20px 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
-.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 50%, #ff3b4e08 0%, transparent 70%); pointer-events: none; }
-.hero-grid { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
-.hero-fecha { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-.hero-coef { font-family: 'Fraunces', serif; font-weight: 900; font-size: clamp(52px, 15vw, 72px); line-height: 1; letter-spacing: -2px; }
-.hero-nivel { display: inline-flex; align-items: center; gap: 7px; border-radius: 20px; padding: 7px 16px; font-size: 14px; letter-spacing: 1px; margin-top: 10px; font-family: 'Fraunces', serif; font-weight: 700; }
-.hero-desc { color: var(--muted); font-size: 14px; margin-top: 10px; line-height: 1.8; max-width: 240px; }
-.hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-.dist-mini { text-align: right; }
-.dist-mini-val { font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; }
-.dist-mini-label { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+/* ══ NAV FOLIOS ══ */
+.site-nav{background:var(--header2);position:sticky;top:0;z-index:100;display:flex;border-bottom:3px solid var(--accent)}
+.nav-tab{
+  flex:1;padding:13px 8px 11px;text-align:center;
+  font-size:var(--text-xs);letter-spacing:1.5px;font-weight:700;
+  color:#888888;background:var(--header);border:none;cursor:pointer;
+  font-family:var(--sans);transition:all 0.2s;
+  border-top:3px solid transparent;border-right:1px solid var(--header2);
+  position:relative;top:3px;border-radius:4px 4px 0 0;
+}
+.nav-tab:last-child{border-right:none}
+.nav-tab.active{color:#fff;background:var(--header2);border-top-color:var(--accent);top:0}
+.nav-tab:hover:not(.active){color:#cccccc;background:var(--header2)}
 
-.zoom-tabs { display: flex; gap: 4px; margin: 16px 20px 0; }
-.zoom-tab { flex: 1; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 13px; font-family: 'DM Mono', monospace; letter-spacing: 1px; cursor: pointer; text-align: center; transition: all 0.2s; }
-.zoom-tab.active { background: var(--surface2); border-color: var(--border2); color: var(--text); }
+/* ══ MASTHEAD ══ */
+.masthead{background:var(--header);color:var(--bg);padding:0;border-bottom:3px solid var(--accent)}
+.masthead-top{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;border-bottom:1px solid var(--header2)}
+.masthead-dateline{font-size:var(--text-xs);letter-spacing:1.5px;color:#888888;font-weight:400}
+.masthead-main{padding:16px 20px 12px;border-bottom:1px solid var(--header2)}
+.masthead-label{font-size:var(--text-xs);letter-spacing:3px;color:#888888;margin-bottom:5px}
+.masthead-title{font-family:var(--serif);font-size:clamp(26px,7vw,36px);font-weight:700;color:#fff;line-height:1.05;letter-spacing:-0.5px}
+.masthead-title span{color:var(--accent)}
+.masthead-claim{font-family:var(--serif);font-style:italic;font-size:var(--text-sm);color:#aaaaaa;margin-top:8px;line-height:1.65;border-left:2px solid var(--accent2);padding-left:10px}
+.masthead-meta{display:flex;align-items:center;justify-content:center;gap:16px;padding:7px 20px;background:var(--header2);flex-wrap:wrap}
+.meta-item{font-size:var(--text-xs);color:#888888;letter-spacing:1px}
+.meta-sep{color:#555555}
+.meta-item.highlight{color:var(--accent)}
 
-.chart-card { margin: 8px 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
-.chart-wrap { position: relative; height: 200px; }
-.chart-empty { display: flex; align-items: center; justify-content: center; height: 200px; color: var(--muted); font-size: 14px; border: 1px dashed var(--border); border-radius: 8px; text-align: center; line-height: 1.8; padding: 20px; }
-.chart-legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
-.legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
-.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-.legend-dash { width: 14px; height: 2px; background: var(--yellow); opacity: 0.6; }
+/* ══ SECCIONES ══ */
+.page-section{display:none}
+.page-section.active{display:block}
 
-.section-title { font-size: 12px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
-.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* ══ KICKER ══ */
+.kicker-section{background:var(--header);padding:18px 20px 14px;border-bottom:3px solid var(--accent)}
+.kicker-label{font-size:var(--text-xs);letter-spacing:2.5px;color:#888888;margin-bottom:10px}
+.kicker-main{display:flex;align-items:flex-end;gap:16px;margin-bottom:10px}
+.kicker-coef{font-family:var(--serif);font-size:68px;font-weight:700;color:#fff;line-height:1;letter-spacing:-3px;transition:color 0.5s}
+.kicker-right{flex:1}
+.kicker-nivel{font-size:var(--text-lg);font-weight:700;letter-spacing:0.5px;margin-bottom:4px;line-height:1.2;transition:color 0.5s}
+.kicker-desc{font-size:var(--text-sm);color:#888888;line-height:1.55;font-family:var(--serif);font-style:italic}
+.kicker-bar{width:100%;height:4px;background:#4e3a10;margin-top:10px;overflow:hidden;border-radius:2px}
+.kicker-bar-fill{height:4px;transition:width 1.2s ease,background 0.5s;border-radius:2px}
+.kicker-meta-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.kicker-updated{font-size:var(--text-xs);color:#777777;letter-spacing:0.5px}
+.kicker-ref{font-size:var(--text-xs);color:#777777;font-family:var(--serif);font-style:italic}
 
-.cat-section { margin: 20px 20px 0; }
-.cat-tabs { display: flex; gap: 4px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
-.cat-tab { flex-shrink: 0; padding: 8px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-family: 'DM Mono', monospace; letter-spacing: 1px; cursor: pointer; color: var(--muted); transition: all 0.2s; white-space: nowrap; }
-.cat-tab[data-cat="todas"].active  { background: #1a1a2e; border-color: #3d3d6e; color: #a0a0d0; }
-.cat-tab[data-cat="Económica"].active { background: #1a0808; border-color: var(--red); color: var(--red); }
-.cat-tab[data-cat="Política"].active  { background: #081018; border-color: var(--blue); color: var(--blue); }
-.cat-tab[data-cat="Social"].active    { background: #100c00; border-color: var(--orange); color: var(--orange); }
+/* ══ PANEL PRINCIPAL: grid 3 columnas ══ 
+   Col 1: termómetro (~35%)
+   Col 2: escala de riesgo (~30%)
+   Col 3: sismógrafo (~35%) — en mobile apila
+*/
+.main-panel{
+  margin:14px 20px 0;
+  display:grid;
+  grid-template-columns:minmax(120px,35%) 1fr minmax(0,1fr);
+  grid-template-rows:auto;
+  gap:10px;
+  align-items:stretch;
+}
+/* En pantallas pequeñas (<520px): termómetro arriba, luego escala y sismo en fila */
+@media(max-width:520px){
+  .main-panel{
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto;
+  }
+  .thermo-box{grid-column:1/3;grid-row:1}
+  .scale-box{height:100%;grid-column:1;grid-row:2}
+  .sismo-box{height:100%;grid-column:2;grid-row:2}
+}
 
-.var-grid { display: flex; flex-direction: column; gap: 10px; }
-.var-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; transition: border-color 0.3s; }
-.var-card:hover { border-color: var(--border2); }
-.var-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-.var-cat-pill { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 500; letter-spacing: 0.5px; margin-bottom: 4px; }
-.var-name { font-family: 'Fraunces', serif; font-weight: 700; font-size: 15px; color: var(--text); line-height: 1.3; }
-.var-desc { color: var(--muted); font-size: 13px; margin-top: 3px; line-height: 1.6; }
-.var-right { text-align: right; flex-shrink: 0; }
-.var-val { font-family: 'Fraunces', serif; font-weight: 900; font-size: 24px; line-height: 1; }
-.var-ref { color: #7070a0; font-size: 12px; margin-top: 3px; }
-.var-track { width: 100%; height: 5px; background: var(--border); border-radius: 2px; position: relative; margin-bottom: 4px; }
-.var-fill { height: 5px; border-radius: 2px; }
-.var-ref-mark { position: absolute; width: 2px; height: 14px; background: var(--yellow); top: -5px; border-radius: 1px; transform: translateX(-50%); opacity: 0.8; }
-.var-track-labels { display: flex; justify-content: space-between; font-size: 11px; color: #6060a0; }
-.var-source-row { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-.src-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; flex-shrink: 0; }
-.src-oficial   { background: #052e16; color: #4ade80; border: 1px solid #16a34a33; }
-.src-encuesta  { background: #1e1b4b; color: #a5b4fc; border: 1px solid #6366f133; }
-.src-media     { background: #1c1917; color: #a8a29e; border: 1px solid #78716c33; }
-.src-rrss      { background: #0c1a2e; color: #38bdf8; border: 1px solid #0ea5e933; }
-.src-nombre    { color: #3d9aff; font-size: 12px; }
-.src-fecha     { color: #7070a0; font-size: 12px; }
-.var-nota      { background: #160d00; border: 1px solid #78350f33; border-radius: 4px; padding: 6px 10px; margin-top: 6px; color: #d97706; font-size: 12px; line-height: 1.6; }
+/* ══ CAJA TERMÓMETRO ══ */
+.thermo-box{
+  background:#fff;border:1px solid var(--rule2);
+  border-left:3px solid var(--rule2);
+  padding:14px 12px 16px;
+  display:flex;flex-direction:column;align-items:center;
+  transition:border-left-color 0.5s;
+  min-height:340px;
+}
+.thermo-box-label{font-size:9px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:10px;text-align:center;line-height:1.4}
+.nivel-badge{
+  padding:6px 10px;text-align:center;margin-top:10px;
+  font-family:var(--sans);font-weight:700;font-size:10px;
+  letter-spacing:1px;border-radius:2px;width:100%;
+  transition:background 0.5s,border-color 0.5s,color 0.5s;
+}
 
-.contrib-section { margin: 20px 20px 0; }
-.contrib-row { margin-bottom: 12px; }
-.contrib-top { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 13px; }
-.contrib-label { color: var(--muted); }
-.contrib-track { height: 4px; background: var(--border); border-radius: 2px; }
-.contrib-fill { height: 4px; border-radius: 2px; }
+/* ══ CAJA ESCALA ══ */
+.scale-box{height:100%;
+  background:#fff;border:1px solid var(--rule2);
+  padding:12px 12px;
+}
+.scale-box-label{font-size:9px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:8px}
+.scale-table{width:100%;border-collapse:collapse}
+.scale-table th{
+  font-size:9px;letter-spacing:0.8px;color:var(--ink3);font-weight:700;
+  padding:4px 5px;border-bottom:2px solid var(--ink);text-align:left;
+}
+.scale-table th.right{text-align:right}
+.scale-table td{padding:6px 5px;border-bottom:1px solid var(--rule2);font-size:var(--text-xs);vertical-align:middle}
+.scale-table tr:last-child td{border-bottom:none}
+.scale-table tr.active-row td{font-weight:700}
+.scale-dot{width:10px;height:10px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:5px;flex-shrink:0}
+.scale-rango{font-family:var(--serif);font-size:10px;text-align:right;white-space:nowrap;color:var(--ink3)}
 
-.bias-section { margin: 20px 20px 0; }
-.bias-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-.bias-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 10px 0 6px; gap: 1px; }
-.bias-seg { transition: flex 0.5s ease; }
-.bias-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
-.fuentes-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }
-.fuente-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
-.fuente-var { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-.fuente-nom { font-size: 13px; color: var(--text); margin-bottom: 3px; }
+/* ══ CAJA SISMÓGRAFO ══ */
+.sismo-box{height:100%;background:#fff;border:1px solid var(--rule2);padding:12px 12px}
+.sismo-label{font-size:9px;letter-spacing:2px;color:var(--ink3);font-weight:700;margin-bottom:6px}
+.sismo-zoom-row{display:flex;gap:4px;margin-bottom:10px}
+.zoom-btn{
+  padding:3px 9px;background:none;border:1px solid var(--rule);
+  color:var(--ink3);font-size:var(--text-xs);cursor:pointer;
+  font-family:var(--sans);font-weight:600;border-radius:2px;transition:all 0.15s;
+}
+.zoom-btn.active{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.zoom-btn:hover:not(.active){border-color:var(--accent2);color:var(--accent2)}
+.sismo-note{font-size:9px;color:var(--rule);margin-top:5px;font-style:italic;text-align:center}
 
-.scale-section { margin: 20px 20px 0; }
-.scale-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid transparent; font-size: 13px; transition: all 0.3s; }
-.scale-item.active { background: var(--surface); font-weight: 600; }
+/* ══ CARDS RESULTADO ══ */
+.result-cards{margin:10px 20px 0}
+.result-card{background:#fff;border:1px solid var(--rule2);padding:16px;margin-bottom:10px}
+.result-label{font-size:var(--text-xs);letter-spacing:2.5px;color:var(--ink3);margin-bottom:12px;font-weight:700}
+.distance-val{font-family:var(--serif);font-weight:700;font-size:36px}
+.contrib-row{margin-bottom:9px}
+.contrib-header{display:flex;justify-content:space-between;margin-bottom:3px;font-size:var(--text-sm)}
+.contrib-track{height:4px;background:var(--rule2);border-radius:2px}
+.contrib-fill{height:4px;border-radius:2px;transition:width 0.7s ease}
 
-.share-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: calc(100% - 40px); margin: 20px 20px 0; padding: 16px; background: #061a0e; border: 1.5px solid #25d366; color: #25d366; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 10px; font-family: 'DM Mono', monospace; font-weight: 500; transition: all 0.2s; }
-.share-btn:hover { background: #25d366; color: #fff; }
+/* ══ BLOQUE PRO ══ */
+.pro-block{position:relative;overflow:hidden;border:1px solid var(--rule2);background:#fff}
+.pro-blur{filter:blur(3px);pointer-events:none;padding:14px 16px;opacity:0.35}
+.pro-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,rgba(253,249,242,0.95) 40%,rgba(242,169,34,0.08) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:22px 18px;text-align:center;
+}
+.pro-icon{font-size:24px;margin-bottom:8px;opacity:0.5}
+.pro-title{font-family:var(--serif);font-size:var(--text-md);font-weight:700;color:var(--ink);margin-bottom:5px}
+.pro-desc{font-size:var(--text-sm);color:var(--ink3);line-height:1.65;margin-bottom:12px;max-width:260px}
+.pro-badge{display:inline-block;background:var(--accent2);color:#fff;font-size:var(--text-xs);font-weight:700;letter-spacing:2px;padding:7px 16px;border-radius:2px;font-family:var(--sans)}
 
-.error-box { margin: 20px; background: #160508; border: 1px solid #7f1d1d; border-radius: 12px; padding: 16px; color: #fca5a5; font-size: 14px; line-height: 1.9; }
-.loading-box { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; gap: 12px; color: var(--muted); font-size: 14px; }
-.spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ══ SHARE + LINK ══ */
+.btn-share{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:15px;background:#075e54;border:none;
+  color:#fff;font-size:var(--text-sm);letter-spacing:2px;cursor:pointer;
+  font-family:var(--sans);font-weight:700;transition:all 0.2s;border-radius:2px;
+}
+.btn-share:hover{background:#128c7e}
+.metod-link{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:12px 20px 0;padding:14px 16px;
+  background:#fff;border:1px solid var(--rule2);border-left:3px solid var(--accent2);
+  cursor:pointer;transition:border-left-color 0.2s;
+}
+.metod-link:hover{border-left-color:var(--n5)}
+.metod-link-text{font-size:var(--text-sm);color:var(--accent2);font-weight:700;letter-spacing:0.3px}
+.metod-link-sub{font-size:var(--text-xs);color:var(--ink3);margin-top:2px;font-family:var(--serif);font-style:italic}
+.metod-link-arrow{font-size:16px;color:var(--rule)}
 
-.footer { text-align: center; color: #7070a0; font-size: 13px; line-height: 2; padding: 24px 20px 16px; margin-top: 20px; border-top: 1px solid var(--border); }
-.footer a { color: #9090c0; text-decoration: none; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-.fade-in { animation: fadeUp 0.5s ease forwards; }
-@keyframes pulseRed { 0%,100%{box-shadow:0 0 0 0 #ff3b4e22} 50%{box-shadow:0 0 20px 8px #ff3b4e11} }
-.pulse { animation: pulseRed 2s infinite; }
+/* ══ AI PANEL ══ */
+.update-panel{background:var(--bg2);border-top:1px solid var(--rule2);overflow:hidden;margin-top:12px}
+.update-header{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--rule2);cursor:pointer;user-select:none;background:var(--bg3)}
+.update-signal{width:8px;height:8px;border-radius:50%;background:var(--rule);flex-shrink:0;transition:background 0.3s}
+.update-signal.active{background:#22c55e;animation:livePulse 1.4s infinite}
+.update-signal.error{background:var(--n5)}
+.update-title{font-size:var(--text-xs);letter-spacing:1.5px;color:var(--ink2);font-weight:700;flex:1}
+.update-badge{font-size:var(--text-xs);padding:2px 8px;border:1px solid var(--rule);color:var(--ink3);letter-spacing:0.5px;border-radius:2px}
+.update-chevron{font-size:11px;color:var(--ink3)}
+.update-body{padding:16px 20px}
+.update-desc{font-size:var(--text-sm);color:var(--ink3);line-height:1.7;margin-bottom:12px}
+.update-desc em{color:var(--ink);font-style:normal;font-weight:700}
+.key-row{display:flex;gap:8px;margin-bottom:10px}
+.key-input{flex:1;background:#fff;border:1px solid var(--rule);color:var(--ink);padding:10px 14px;font-family:var(--sans);font-size:var(--text-sm);outline:none;transition:border-color 0.2s;border-radius:2px}
+.key-input:focus{border-color:var(--ink)}
+.key-input::placeholder{color:var(--rule)}
+.btn-update{padding:10px 14px;background:var(--header);border:1px solid var(--header);color:#fff;font-size:var(--text-xs);letter-spacing:1.5px;cursor:pointer;font-family:var(--sans);font-weight:700;transition:all 0.2s;white-space:nowrap;border-radius:2px}
+.btn-update:hover:not(:disabled){background:var(--accent);border-color:var(--accent);color:var(--header)}
+.btn-update:disabled{opacity:0.4;cursor:not-allowed}
+.privacy{font-size:var(--text-xs);color:var(--rule);margin-bottom:10px;line-height:1.55}
+.ai-log{background:#fff;border:1px solid var(--rule2);padding:10px 14px;min-height:40px;max-height:120px;overflow-y:auto;font-size:var(--text-xs);line-height:1.9;font-family:var(--sans);display:none;border-radius:2px}
+.ai-log.visible{display:block}
+.log-line.search{color:#2c4a6e}
+.log-line.data{color:#1a7a4a}
+.log-line.warn{color:var(--accent2)}
+.log-line.err{color:var(--n5)}
+.log-line.done{color:#1a7a4a;font-weight:700}
+.sources-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.source-chip{font-size:var(--text-xs);padding:3px 9px;border:1px solid var(--rule2);color:var(--ink3);background:#fff;border-radius:2px}
+
+/* ══ FOOTER ══ */
+.footer{text-align:center;color:var(--rule);font-size:var(--text-xs);line-height:1.9;padding:20px 20px 12px;border-top:1px solid var(--rule2);margin-top:16px}
+.footer strong{color:var(--ink3)}
+
+/* ══ METODOLOGÍA ══ */
+.metod-page{padding:0 0 40px}
+.metod-hero{background:var(--header);padding:22px 20px 18px;border-bottom:3px double var(--rule)}
+.metod-hero-label{font-size:var(--text-xs);letter-spacing:3px;color:#888888;margin-bottom:6px}
+.metod-hero-title{font-family:var(--serif);font-size:var(--text-xl);font-weight:700;color:#fff;line-height:1.2}
+.metod-hero-sub{font-size:var(--text-sm);color:#aaaaaa;margin-top:8px;line-height:1.65;font-family:var(--serif);font-style:italic}
+.metod-section{padding:20px 20px 0}
+.metod-section-label{font-size:var(--text-xs);letter-spacing:2.5px;color:var(--ink3);font-weight:700;padding-bottom:8px;border-bottom:2px solid var(--ink);margin-bottom:14px}
+.metod-intro{font-family:var(--serif);font-size:var(--text-base);color:var(--ink);line-height:1.75;margin-bottom:14px}
+.metod-intro strong{font-weight:700}
+.metod-body{font-size:var(--text-sm);color:var(--ink3);line-height:1.75;margin-bottom:12px}
+.metod-body em{color:var(--ink);font-style:italic}
+.var-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:var(--text-sm)}
+.var-table thead tr{border-bottom:2px solid var(--ink)}
+.var-table th{text-align:left;padding:6px 8px;font-size:var(--text-xs);letter-spacing:1px;font-weight:700;color:var(--ink3)}
+.var-table td{padding:7px 8px;border-bottom:1px solid var(--rule2);vertical-align:top}
+.var-table tr:last-child td{border-bottom:none}
+.cat-badge{display:inline-block;font-size:var(--text-xs);padding:2px 6px;font-weight:700;letter-spacing:0.5px;border-radius:1px;white-space:nowrap}
+.peso-val{font-family:var(--serif);font-weight:700;font-size:var(--text-md)}
+.ref-val{font-family:var(--serif);color:var(--accent2);font-size:var(--text-md)}
+.baseline-box{background:#fff;border:1px solid var(--rule2);border-left:3px solid var(--accent2);padding:14px;margin-bottom:14px}
+.baseline-title{font-size:var(--text-xs);font-weight:700;letter-spacing:1px;color:var(--accent2);margin-bottom:8px}
+.baseline-row{display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--rule2);font-size:var(--text-sm)}
+.baseline-row:last-child{border-bottom:none}
+.baseline-label{color:var(--ink3);flex:1}
+.baseline-val{font-family:var(--serif);font-weight:700;font-size:var(--text-md);color:var(--accent2);flex-shrink:0}
+.formula-box{background:var(--header);color:#fff;padding:14px;margin-bottom:14px}
+.formula-title{font-size:var(--text-xs);letter-spacing:2px;color:#888888;margin-bottom:8px}
+.formula-eq{font-size:var(--text-base);color:var(--accent);line-height:1.9;font-family:var(--serif)}
+.formula-note{font-size:var(--text-xs);color:#888888;margin-top:8px;line-height:1.65}
+.fuente-card{background:#fff;border:1px solid var(--rule2);border-left:3px solid var(--rule2);padding:12px 14px;margin-bottom:10px}
+.fuente-card.conservadora{border-left-color:#8c3e22}
+.fuente-card.progresista{border-left-color:#2c4a6e}
+.fuente-card.centro{border-left-color:#1a7a4a}
+.fuente-card.oficial{border-left-color:var(--ink3)}
+.fuente-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:4px}
+.fuente-name{font-size:var(--text-base);font-weight:700;color:var(--ink)}
+.fuente-tag{font-size:var(--text-xs);padding:2px 8px;border-radius:1px;font-weight:700;letter-spacing:0.5px}
+.fuente-desc{font-size:var(--text-sm);color:var(--ink3);line-height:1.55}
+.sesgo-box{background:#fff;border:1px solid var(--rule2);padding:14px;margin-bottom:14px}
+.sesgo-title{font-size:var(--text-sm);font-weight:700;letter-spacing:1px;color:var(--ink);margin-bottom:8px}
+.sesgo-steps{list-style:none;padding:0}
+.sesgo-steps li{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule2);font-size:var(--text-sm)}
+.sesgo-steps li:last-child{border-bottom:none}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--header);color:#fff;font-size:var(--text-xs);font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{color:var(--ink3);line-height:1.55}
+.step-text strong{color:var(--ink)}
+.balance-strip{display:flex;gap:3px;margin:10px 0 4px}
+.balance-seg{flex:1;height:6px;border-radius:1px}
+
+/* ANIMATIONS */
+@keyframes pulseLevel{0%,100%{box-shadow:0 0 0 0 rgba(232,32,32,0.25)}50%{box-shadow:0 0 14px 5px rgba(232,32,32,0.08)}}
+.pulse{animation:pulseLevel 2s infinite}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-top">
-    <div class="header-label">ÍNDICE DIARIO · CHILE 2026</div>
-    <div class="live-dot">EN VIVO</div>
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-top">
+    <span class="masthead-dateline" id="headerDate">CARGANDO...</span>
+    <div class="en-vivo"><div class="en-vivo-dot"></div>EN VIVO</div>
   </div>
-  <h1>Termómetro<br><em>Social</em> Chile</h1>
-  <p class="header-sub">Coeficiente de tensión social actualizado diariamente con IA.<br>8 variables · fuentes de espectro editorial diverso.</p>
-  <div class="ref-pill">⚡ 0 = Democracia estable &nbsp;·&nbsp; 1 = Estallido social</div>
+  <div class="masthead-main">
+    <div class="masthead-label">MONITOR DE TENSIÓN SOCIAL</div>
+    <h1 class="masthead-title">Termómetro Social<br><span>Chile 2026</span></h1>
+    <p class="masthead-claim">Revisa la temperatura diaria del país aquí, a partir de los últimos acontecimientos políticos, económicos y sociales.</p>
+  </div>
+  <div class="masthead-meta">
+    <span class="meta-item">0 = Democracia estable</span>
+    <span class="meta-sep">·</span>
+    <span class="meta-item highlight">1 = Estallido social</span>
+    <span class="meta-sep">·</span>
+    <span class="meta-item">Actualización diaria</span>
+  </div>
 </div>
 
-<div id="mainContent">
-  <div class="loading-box"><div class="spinner"></div>Cargando datos...</div>
-</div>
+<!-- NAVEGACIÓN FOLIOS -->
+<nav class="site-nav">
+  <button class="nav-tab active" id="tab-portada" onclick="showPage('portada')">PORTADA</button>
+  <button class="nav-tab" id="tab-metodologia" onclick="showPage('metodologia')">METODOLOGÍA DE CÁLCULO</button>
+</nav>
 
-<div class="footer">
-  Herramienta independiente de análisis político-social.<br>
-  Datos actualizados diariamente vía IA + búsqueda web.<br>
-  No constituye predicción ni declaración política oficial.<br><br>
+<!-- ════════════ PORTADA ════════════ -->
+<div class="page-section active" id="page-portada">
+
+  <!-- KICKER -->
+  <div class="kicker-section">
+    <div class="kicker-label">COEFICIENTE DE TENSIÓN SOCIAL · HOY</div>
+    <div class="kicker-main">
+      <div class="kicker-coef" id="kickerCoef">—</div>
+      <div class="kicker-right">
+        <div class="kicker-nivel" id="kickerNivel" style="color:#888888">—</div>
+        <div class="kicker-desc" id="kickerDesc"></div>
+        <div class="kicker-bar"><div class="kicker-bar-fill" id="kickerBarFill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="kicker-meta-row">
+      <span class="kicker-updated" id="kickerUpdated"></span>
+      <span class="kicker-ref">Ref. 18-O 2019: 0,847</span>
+    </div>
+  </div>
+
+  <!-- PANEL PRINCIPAL: 3 columnas -->
+  <div class="main-panel">
+
+    <!-- COL 1: TERMÓMETRO (~35%) -->
+    <div class="thermo-box" id="thermoBox">
+      <div class="thermo-box-label">ÍNDICE DE TENSIÓN SOCIAL</div>
+      <svg id="thermoSvg" viewBox="0 0 100 290" width="100%" style="display:block;max-width:130px"></svg>
+      <div class="nivel-badge" id="nivelBadge"></div>
+      <p id="nivelDesc" style="color:var(--ink3);font-size:10px;text-align:center;margin-top:7px;line-height:1.55;font-family:var(--serif);font-style:italic"></p>
+    </div>
+
+    <!-- COL 2: ESCALA DE RIESGO -->
+    <div class="scale-box">
+      <div class="scale-box-label">ESCALA DE RIESGO</div>
+      <table class="scale-table">
+        <thead>
+          <tr>
+            <th colspan="2">NIVEL</th>
+            <th class="right">RANGO</th>
+          </tr>
+        </thead>
+        <tbody id="scaleContainer"></tbody>
+      </table>
+    </div>
+
+    <!-- COL 3: SISMÓGRAFO -->
+    <div class="sismo-box">
+      <div class="sismo-label">EVOLUCIÓN DEL ÍNDICE EN EL TIEMPO</div>
+      <div class="sismo-zoom-row">
+        <button class="zoom-btn" id="zoom7" onclick="setZoom(7)">7 días</button>
+        <button class="zoom-btn active" id="zoom30" onclick="setZoom(30)">1 mes</button>
+        <button class="zoom-btn" id="zoom365" onclick="setZoom(365)">1 año</button>
+      </div>
+      <svg id="sismoSvg" viewBox="0 0 260 110" width="100%" style="display:block"></svg>
+      <div class="sismo-note">Datos ilustrativos — el historial real se acumula con las actualizaciones diarias</div>
+    </div>
+
+  </div>
+
+  <!-- CARDS RESULTADO -->
+  <div class="result-cards">
+    <div class="result-card" id="distCard" style="display:none">
+      <div class="result-label">DISTANCIA RESPECTO AL 18-O 2019</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="distance-val" id="distVal"></div>
+        <div>
+          <div id="distLabel" style="font-size:var(--text-base);font-weight:700"></div>
+          <div id="distPct" style="color:var(--ink3);font-size:var(--text-sm);margin-top:2px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="result-card" id="contribCard" style="display:none">
+      <div class="result-label">CONTRIBUCIÓN POR VARIABLE</div>
+      <div id="contribContainer"></div>
+    </div>
+    <div class="result-card" id="dataSourceCard" style="display:none">
+      <div class="result-label">FUENTES CONSULTADAS HOY</div>
+      <div id="dataSourceList" style="font-size:var(--text-sm);color:var(--ink3);line-height:2.2"></div>
+    </div>
+  </div>
+
+  <!-- WHATSAPP -->
+  <div style="margin:10px 20px 0">
+    <button class="btn-share" id="btnShare">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L0 24l6.336-1.51A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.373l-.36-.214-3.732.889.926-3.63-.235-.373A9.818 9.818 0 0112 2.182c5.422 0 9.818 4.396 9.818 9.818S17.422 21.818 12 21.818z"/></svg>
+      COMPARTIR POR WHATSAPP
+    </button>
+  </div>
+
+  <!-- LINK METODOLOGÍA -->
+  <div class="metod-link" onclick="showPage('metodologia')">
+    <div>
+      <div class="metod-link-text">¿CÓMO SE CALCULA ESTE ÍNDICE?</div>
+      <div class="metod-link-sub">Variables, ponderaciones, fuentes y corrección de sesgo ideológico</div>
+    </div>
+    <div class="metod-link-arrow">→</div>
+  </div>
+
+  <!-- AI UPDATE -->
+  <div class="update-panel">
+    <div class="update-header" onclick="togglePanel()">
+      <div class="update-signal" id="aiDot"></div>
+      <span class="update-title">ACTUALIZAR CON DATOS EN TIEMPO REAL</span>
+      <span class="update-badge">IA + WEB</span>
+      <span id="aiChevron" class="update-chevron">▼</span>
+    </div>
+    <div class="update-body" id="aiBody">
+      <p class="update-desc">Ingresa tu <em>API Key de Anthropic</em> para que la IA consulte fuentes chilenas actuales y actualice las variables a hoy.</p>
+      <div class="key-row">
+        <input type="password" class="key-input" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off">
+        <button class="btn-update" id="btnActualizar" onclick="actualizarConIA()">⚡ ACTUALIZAR</button>
+      </div>
+      <p class="privacy">🔒 La clave se usa solo para llamar a api.anthropic.com desde tu navegador. No se almacena.</p>
+      <div class="ai-log" id="aiLog"></div>
+      <div class="sources-row" id="sourcesRow"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>Termómetro Social Chile</strong> · Herramienta de análisis político-social<br>
+    Pesos calibrados en base a literatura sociológica sobre el 18-O 2019<br>
+    No constituye predicción ni declaración política oficial
+  </div>
+
+</div><!-- /portada -->
+
+
+<!-- ════════════ METODOLOGÍA ════════════ -->
+<div class="page-section" id="page-metodologia">
+<div class="metod-page">
+
+  <div class="metod-hero">
+    <div class="metod-hero-label">TRANSPARENCIA Y METODOLOGÍA</div>
+    <h2 class="metod-hero-title">¿Cómo funciona el<br>Termómetro Social?</h2>
+    <p class="metod-hero-sub">Una explicación clara y completa sobre variables, ponderaciones, fuentes de información y corrección de sesgo ideológico.</p>
+  </div>
+
+  <div class="metod-section">
+    <div class="metod-section-label">PARTE 1 · LAS VARIABLES Y EL MODELO</div>
+    <p class="metod-intro">El índice mide <strong>8 variables</strong> que la literatura sociológica identifica como los principales precursores de tensión social en Chile y América Latina.</p>
+    <p class="metod-body">Cada variable pertenece a uno de tres ámbitos: <em>económico</em> (desigualdad, costo de vida, desempleo), <em>político</em> (confianza institucional, fragmentación) y <em>social</em> (movilización, percepción de abuso).</p>
+
+    <table class="var-table">
+      <thead><tr><th>VARIABLE</th><th>ÁMBITO</th><th>PESO</th><th>REF. 2019</th></tr></thead>
+      <tbody id="varTableBody"></tbody>
+    </table>
+
+    <div class="baseline-box">
+      <div class="baseline-title">VALORES DE LÍNEA DE BASE — 18-O 2019</div>
+      <p style="font-size:var(--text-sm);color:var(--ink3);margin-bottom:10px;line-height:1.65">
+        Los valores de referencia corresponden a los indicadores registrados durante el estallido del 18-O 2019. La escala mide qué tan cerca o lejos estamos de ese escenario (<strong style="color:var(--accent2)">coeficiente ≈ 0,847</strong>).
+      </p>
+      <div id="baselineRows"></div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-title">FÓRMULA DE CÁLCULO</div>
+      <div class="formula-eq">
+        Índice = Σ ( variable_normalizada × peso )<br>
+        <span style="font-size:13px;color:#888888">donde variable_normalizada ∈ [0, 1]</span>
+      </div>
+      <div class="formula-note">Cada variable se normaliza entre su mínimo y máximo histórico. Las variables inversas (confianza institucional) se invierten: a mayor confianza, menor tensión.</div>
+    </div>
+  </div>
+
+  <!-- BLOQUE PRO -->
+  <div style="margin:0 20px">
+    <div style="font-size:var(--text-xs);letter-spacing:2.5px;color:var(--ink3);font-weight:700;padding:16px 0 8px;border-top:1px solid var(--rule2)">SIMULADOR INTERACTIVO</div>
+    <div class="pro-block">
+      <div class="pro-blur">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="height:50px;background:var(--bg2);border-radius:2px"></div>
+          <div style="height:50px;background:var(--bg2);border-radius:2px"></div>
+          <div style="height:50px;background:var(--bg2);border-radius:2px"></div>
+        </div>
+        <div style="height:44px;background:var(--header);border-radius:2px;margin-top:10px;opacity:0.3"></div>
+      </div>
+      <div class="pro-overlay">
+        <div class="pro-icon">🔒</div>
+        <div class="pro-title">Simulador de Variables</div>
+        <div class="pro-desc">Ajusta manualmente las 8 variables y recalcula el coeficiente de tensión social en tiempo real.</div>
+        <div class="pro-badge">FUNCIÓN PRO · PRÓXIMAMENTE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTE 2 -->
+  <div class="metod-section" style="margin-top:26px">
+    <div class="metod-section-label">PARTE 2 · FUENTES DE INFORMACIÓN Y SESGO IDEOLÓGICO</div>
+    <p class="metod-intro">La objetividad del índice depende de <strong>quién informa los datos</strong>. Todo medio tiene una perspectiva editorial. Para compensarlo, consultamos fuentes con distintas orientaciones y promediamos sus señales.</p>
+
+    <!-- BALANCE VISUAL -->
+    <div style="background:#fff;border:1px solid var(--rule2);padding:14px;margin-bottom:14px">
+      <div style="font-size:var(--text-xs);letter-spacing:1.5px;color:var(--ink3);font-weight:700;margin-bottom:8px">BALANCE EDITORIAL — 4 · 4 · 4</div>
+      <div class="balance-strip">
+        <div class="balance-seg" style="background:#8c3e22;flex:4"></div>
+        <div class="balance-seg" style="background:#1a7a4a;flex:4"></div>
+        <div class="balance-seg" style="background:#2c4a6e;flex:4"></div>
+      </div>
+      <div style="display:flex;gap:3px;margin-top:4px">
+        <div style="flex:4;font-size:9px;color:#8c3e22;font-weight:700">4 CONSERVADORA</div>
+        <div style="flex:4;font-size:9px;color:#1a7a4a;font-weight:700;text-align:center">4 PROGRESISTA</div>
+        <div style="flex:4;font-size:9px;color:#2c4a6e;font-weight:700;text-align:right">4 CENTRO</div>
+      </div>
+      <p style="font-size:var(--text-xs);color:var(--ink3);margin-top:8px;line-height:1.55">Más las <strong>fuentes oficiales</strong> (INE, BCCh, etc.) que se priorizan por sobre cualquier línea editorial. El balance 4-4-4 garantiza que ninguna orientación ideológica domina el cálculo.</p>
+    </div>
+
+    <div style="font-size:var(--text-xs);letter-spacing:2px;color:var(--ink3);margin-bottom:10px;font-weight:700">MEDIOS Y FUENTES CONSULTADAS</div>
+
+    <div class="fuente-card oficial">
+      <div class="fuente-header">
+        <span class="fuente-name">Fuentes Oficiales</span>
+        <span class="fuente-tag" style="background:var(--bg2);color:var(--ink3);border:1px solid var(--rule)">OFICIAL</span>
+      </div>
+      <div class="fuente-desc">INE (desempleo, Gini), Banco Central, Ministerio de Hacienda, OCDE, Banco Mundial. Datos duros con metodología verificable. <strong>Se priorizan sobre todas las demás fuentes.</strong></div>
+    </div>
+    <div class="fuente-card conservadora">
+      <div class="fuente-header">
+        <span class="fuente-name">Tendencia conservadora</span>
+        <span class="fuente-tag" style="background:#fdf0ef;color:#8c3e22;border:1px solid #f0c0b0">CONSERVADORA · 4 fuentes</span>
+      </div>
+      <div class="fuente-desc">El Mercurio, La Tercera, Radio Bío-Bío, Cadem/Plaza Pública y CEP. Cobertura enfocada en estabilidad institucional, economía de mercado y orden público.</div>
+    </div>
+    <div class="fuente-card progresista">
+      <div class="fuente-header">
+        <span class="fuente-name">Tendencia progresista</span>
+        <span class="fuente-tag" style="background:#eaf5ef;color:#1a7a4a;border:1px solid #9fe1cb">PROGRESISTA · 4 fuentes</span>
+      </div>
+      <div class="fuente-desc">El Mostrador, The Clinic, El Desconcierto y CERC-MORI. Cobertura enfocada en desigualdad, derechos sociales, crítica institucional y perspectiva ciudadana.</div>
+    </div>
+    <div class="fuente-card centro">
+      <div class="fuente-header">
+        <span class="fuente-name">Tendencia centro</span>
+        <span class="fuente-tag" style="background:#eff4fb;color:#2c4a6e;border:1px solid #b5d4f4">CENTRO · 4 fuentes</span>
+      </div>
+      <div class="fuente-desc">CNN Chile, Radio Cooperativa, IPSOS y Activa Research. Cobertura transversal y encuestadoras con metodología independiente.</div>
+    </div>
+
+    <div class="sesgo-box" style="margin-top:14px">
+      <div class="sesgo-title">CÓMO SE CORRIGE EL SESGO IDEOLÓGICO</div>
+      <ul class="sesgo-steps">
+        <li><div class="step-num">1</div><div class="step-text"><strong>Consulta plural:</strong> la IA busca cada variable en al menos dos orientaciones editoriales distintas antes de asignar un valor.</div></li>
+        <li><div class="step-num">2</div><div class="step-text"><strong>Prioridad a fuentes primarias:</strong> los datos oficiales (INE, BCCh, encuestadoras) se priorizan siempre sobre las interpretaciones periodísticas.</div></li>
+        <li><div class="step-num">3</div><div class="step-text"><strong>Registro de discrepancias:</strong> cuando dos fuentes entregan cifras distintas, se registra el rango y se usa el promedio o el dato más reciente.</div></li>
+        <li><div class="step-num">4</div><div class="step-text"><strong>Transparencia total:</strong> cada variable muestra su fuente exacta, fecha y nota metodológica para verificación independiente.</div></li>
+        <li><div class="step-num">5</div><div class="step-text"><strong>Variables cualitativas:</strong> para movilización y percepción de abuso, la IA sintetiza señales de múltiples medios antes de asignar un valor numérico.</div></li>
+      </ul>
+    </div>
+
+    <p style="font-family:var(--serif);font-style:italic;font-size:var(--text-sm);border-left:3px solid var(--rule2);padding-left:12px;color:var(--ink3);line-height:1.75;margin-bottom:16px">
+      "Ningún índice es completamente neutral. El Termómetro Social busca reducir el sesgo siendo explícito sobre sus fuentes, su metodología y sus limitaciones."
+    </p>
+
+    <div class="metod-link" onclick="showPage('portada')" style="margin:0 0 4px">
+      <div>
+        <div class="metod-link-text">← VOLVER A PORTADA</div>
+        <div class="metod-link-sub">Ver el coeficiente de tensión social de hoy</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>Termómetro Social Chile</strong> · Herramienta de análisis político-social<br>
+    Pesos calibrados en base a literatura sociológica sobre el 18-O 2019<br>
+    No constituye predicción ni declaración política oficial
+  </div>
+
 </div>
+</div><!-- /metodologia -->
+
 
 <script>
-const VARIABLES = [
-  { id:'gini',         cat:'Económica', color:'#ff3b4e', label:'Desigualdad económica (Gini)',          desc:'Concentración del ingreso en la población',                  peso:0.18, ref2019:0.46, min:0.25, max:0.65, fmt:v=>v.toFixed(2) },
-  { id:'costo',        cat:'Económica', color:'#ff3b4e', label:'Percepción alza costo de vida (%)',     desc:'Ciudadanos que sienten que no les alcanza el sueldo',        peso:0.15, ref2019:72,   min:20,   max:100,  fmt:v=>`${v}%` },
-  { id:'desempleo',    cat:'Económica', color:'#ff3b4e', label:'Tasa de desempleo (%)',                 desc:'Desempleo formal e informal combinado',                      peso:0.10, ref2019:7.2,  min:2,    max:25,   fmt:v=>`${v.toFixed(1)}%` },
-  { id:'conf_gob',     cat:'Política',  color:'#3d9aff', label:'Confianza en el gobierno (%)',          desc:'Aprobación presidencial y confianza en el Estado',           peso:0.14, ref2019:14,   min:5,    max:80,   fmt:v=>`${v}%`, inverso:true },
-  { id:'conf_cong',    cat:'Política',  color:'#3d9aff', label:'Confianza en el Congreso (%)',          desc:'Legitimidad percibida del poder legislativo',                peso:0.10, ref2019:11,   min:3,    max:70,   fmt:v=>`${v}%`, inverso:true },
-  { id:'movilizacion', cat:'Social',    color:'#ff7b3a', label:'Nivel de movilización social (1–10)',   desc:'Frecuencia e intensidad de protestas y marchas activas',    peso:0.13, ref2019:9.5,  min:1,    max:10,   fmt:v=>v.toFixed(1) },
-  { id:'abuso',        cat:'Social',    color:'#ff7b3a', label:'Percepción abuso institucional (%)',    desc:'Ciudadanos que reportan haber vivido o presenciado abuso',  peso:0.10, ref2019:68,   min:5,    max:95,   fmt:v=>`${v}%` },
-  { id:'frag',         cat:'Política',  color:'#3d9aff', label:'Fragmentación política (N° partidos)',  desc:'Partidos con representación real y polarización política',   peso:0.10, ref2019:8.5,  min:2,    max:20,   fmt:v=>v.toFixed(1) },
+const VARIABLES=[
+  {id:"gini",        cat:"Económica",catColor:"#b85c38",catBg:"#fdf0eb",label:"Desigualdad económica (Gini)",         desc:"Nivel de concentración del ingreso en la población",         peso:0.18,ref2019:0.46,min:0.25,max:0.65,step:0.01,fmt:v=>v.toFixed(2)},
+  {id:"costo",       cat:"Económica",catColor:"#b85c38",catBg:"#fdf0eb",label:"Percepción alza costo de vida (%)",    desc:"Ciudadanos que sienten que no les alcanza el sueldo",        peso:0.15,ref2019:72,  min:20,  max:100, step:1,   fmt:v=>`${v}%`},
+  {id:"desempleo",   cat:"Económica",catColor:"#b85c38",catBg:"#fdf0eb",label:"Tasa de desempleo (%)",                desc:"Desempleo formal e informal combinado",                      peso:0.10,ref2019:7.2, min:2,   max:25,  step:0.1, fmt:v=>`${v.toFixed(1)}%`},
+  {id:"conf_gob",    cat:"Política", catColor:"#2c4a6e",catBg:"#eff4fb",label:"Confianza en el gobierno (%)",         desc:"Aprobación presidencial y confianza en el Estado",           peso:0.14,ref2019:14,  min:5,   max:80,  step:1,   fmt:v=>`${v}%`,inverso:true},
+  {id:"conf_cong",   cat:"Política", catColor:"#2c4a6e",catBg:"#eff4fb",label:"Confianza en el Congreso (%)",         desc:"Legitimidad percibida del poder legislativo",                peso:0.10,ref2019:11,  min:3,   max:70,  step:1,   fmt:v=>`${v}%`,inverso:true},
+  {id:"movilizacion",cat:"Social",   catColor:"#8C641B",catBg:"#fdf5e8",label:"Nivel de movilización social (1–10)",  desc:"Frecuencia e intensidad de protestas y marchas activas",    peso:0.13,ref2019:9.5, min:1,   max:10,  step:0.1, fmt:v=>v.toFixed(1)},
+  {id:"abuso",       cat:"Social",   catColor:"#8C641B",catBg:"#fdf5e8",label:"Percepción abuso institucional (%)",   desc:"Ciudadanos que reportan haber vivido o presenciado abuso",  peso:0.10,ref2019:68,  min:5,   max:95,  step:1,   fmt:v=>`${v}%`},
+  {id:"frag",        cat:"Política", catColor:"#2c4a6e",catBg:"#eff4fb",label:"Fragmentación política (N° partidos)", desc:"Partidos con representación real y polarización política",   peso:0.10,ref2019:8.5, min:2,   max:20,  step:0.5, fmt:v=>v.toFixed(1)},
 ];
 
-const NIVELES = [
-  { label:'DEMOCRACIA ESTABLE',  rango:'0.00–0.25', color:'#3ddc84', emoji:'✅', desc:'Instituciones sólidas, alta confianza ciudadana y malestar social bajo.' },
-  { label:'ESTABILIDAD FRÁGIL',  rango:'0.25–0.40', color:'#3ddce0', emoji:'🔵', desc:'Democracia funcional con tensiones manejables. Vigilancia recomendada.' },
-  { label:'ALERTA MODERADA',     rango:'0.40–0.55', color:'#f5c842', emoji:'📊', desc:'Indicadores de riesgo presentes. Se requieren medidas preventivas.' },
-  { label:'TENSIÓN ELEVADA',     rango:'0.55–0.70', color:'#ff7b3a', emoji:'🌡️', desc:'Malestar social significativo. Condiciones propicias para protestas masivas.' },
-  { label:'CRISIS SOCIAL ALTA',  rango:'0.70–0.85', color:'#ff4500', emoji:'⚠️', desc:'Tensiones extremas. Riesgo muy alto de escalada violenta.' },
-  { label:'ESTALLIDO SOCIAL',    rango:'0.85–1.00', color:'#ff3b4e', emoji:'🔥', desc:'Condiciones equivalentes o superiores al 18-O 2019. Ruptura social inminente.' },
+/* Escala clásica: verde→amarillo-naranja→rojo */
+const NIVELES=[
+  {label:"DEMOCRACIA ESTABLE", rango:"0,00–0,25",color:"#1a7a4a",desc:"Instituciones sólidas, alta confianza ciudadana y malestar social bajo."},
+  {label:"ESTABILIDAD FRÁGIL", rango:"0,25–0,40",color:"#4a9e5c",desc:"Democracia funcional con tensiones manejables. Vigilancia recomendada."},
+  {label:"ALERTA MODERADA",    rango:"0,40–0,55",color:"#e8a020",desc:"Indicadores de riesgo presentes. Se requieren medidas preventivas."},
+  {label:"TENSIÓN ELEVADA",    rango:"0,55–0,70",color:"#e06010",desc:"Malestar social significativo. Condiciones propicias para protestas masivas."},
+  {label:"CRISIS SOCIAL ALTA", rango:"0,70–0,85",color:"#cc2200",desc:"Tensiones extremas. Riesgo muy alto de escalada violenta."},
+  {label:"ESTALLIDO SOCIAL",   rango:"0,85–1,00",color:"#e82020",desc:"Condiciones equivalentes o superiores al 18-O 2019. Ruptura social inminente."},
 ];
-
-function getNivel(c) {
+function getNivel(c){
   if(c>=0.85)return NIVELES[5];if(c>=0.70)return NIVELES[4];
   if(c>=0.55)return NIVELES[3];if(c>=0.40)return NIVELES[2];
   if(c>=0.25)return NIVELES[1];return NIVELES[0];
 }
 
-function miniGaugeSVG(coef, nivel) {
-  const toRad = a=>((a-90)*Math.PI)/180;
-  const arc=(r,s,e)=>{
-    const[x1,y1]=[80+r*Math.cos(toRad(s)),80+r*Math.sin(toRad(s))];
-    const[x2,y2]=[80+r*Math.cos(toRad(e)),80+r*Math.sin(toRad(e))];
-    return `M${x1} ${y1} A${r} ${r} 0 ${e-s>180?1:0} 1 ${x2} ${y2}`;
-  };
-  const zones=[[-140,-84,'#3ddc84'],[-84,-28,'#3ddce0'],[-28,28,'#f5c842'],[28,84,'#ff7b3a'],[84,140,'#ff3b4e']];
-  const ang=-140+coef*280;
-  const[nx,ny]=[80+52*Math.cos(toRad(ang)),80+52*Math.sin(toRad(ang))];
-  const angRef=-140+0.847*280;
-  const[rx,ry]=[80+52*Math.cos(toRad(angRef)),80+52*Math.sin(toRad(angRef))];
-  return `<svg viewBox="0 0 160 112" width="130">
-    ${zones.map(([s,e,c])=>`<path d="${arc(58,s,e)}" fill="none" stroke="${c}" stroke-width="12" opacity="0.85"/>`).join('')}
-    <line x1="80" y1="80" x2="${rx}" y2="${ry}" stroke="#f5c842" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.5"/>
-    <line x1="80" y1="80" x2="${nx}" y2="${ny}" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="80" cy="80" r="4" fill="${nivel.color}"/>
-  </svg>`;
+let valores={},fuentes={},panelOpen=true,lastCoef=null,currentZoom=30;
+VARIABLES.forEach(v=>{valores[v.id]=v.ref2019;fuentes[v.id]=null});
+
+document.getElementById('headerDate').textContent=
+  new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+
+function showPage(page){
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('tab-'+page).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-let chartInstance=null, historialGlobal=[], zoomActual='mes', catActiva='todas', _coefDataGlobal=null;
-
-function detectarEventos(data) {
-  const eventos=[], UMBRAL=0.04;
-  for(let i=1;i<data.length;i++){
-    const diff=Math.abs(data[i].coeficiente-data[i-1].coeficiente);
-    if(diff>=UMBRAL){
-      const dir=data[i].coeficiente>data[i-1].coeficiente?'▲':'▼';
-      eventos.push({index:i, label:`${dir} ${diff.toFixed(3)}`, coef:data[i].coeficiente});
-    }
-  }
-  return eventos;
-}
-
-function renderChart(historial, zoom) {
-  const now=new Date();
-  let desde;
-  if(zoom==='semana') desde=new Date(now-7*864e5);
-  else if(zoom==='mes') desde=new Date(now-30*864e5);
-  else desde=new Date(now-365*864e5);
-
-  const filtrado=historial.filter(d=>!d.fecha_iso||new Date(d.fecha_iso)>=desde);
-
-  if(filtrado.length<2){
-    const w=document.getElementById('chartWrap');
-    if(w) w.innerHTML=`<div class="chart-empty">Historial insuficiente para este período.<br>Se acumulará con el uso diario.</div>`;
-    return;
-  }
-
-  const labels=filtrado.map(d=>d.fecha_iso||'');
-  const values=filtrado.map(d=>d.coeficiente);
-  const eventos=detectarEventos(filtrado);
-  const ptColors=values.map((v,i)=>eventos.some(e=>e.index===i)?getNivel(v).color:'transparent');
-  const ptRadius=values.map((v,i)=>eventos.some(e=>e.index===i)?6:2);
-
-  const canvas=document.getElementById('chartCanvas');
-  if(!canvas) return;
-  if(chartInstance){chartInstance.destroy();chartInstance=null;}
-
-  chartInstance=new Chart(canvas,{
-    type:'line',
-    data:{
-      labels,
-      datasets:[
-        {
-          label:'Coeficiente',
-          data:values,
-          borderColor:'#ff3b4e',
-          borderWidth:2,
-          backgroundColor:(ctx)=>{
-            const{ctx:c,chartArea}=ctx.chart;
-            if(!chartArea) return 'transparent';
-            const g=c.createLinearGradient(0,chartArea.top,0,chartArea.bottom);
-            g.addColorStop(0,'rgba(255,59,78,0.15)');
-            g.addColorStop(1,'rgba(255,59,78,0)');
-            return g;
-          },
-          fill:true, tension:0.4,
-          pointRadius:ptRadius,
-          pointBackgroundColor:ptColors,
-          pointBorderColor:ptColors,
-        },
-        {
-          label:'18-O 2019',
-          data:Array(values.length).fill(0.847),
-          borderColor:'#f5c842',
-          borderWidth:1,
-          borderDash:[4,4],
-          pointRadius:0,
-          fill:false,
-        }
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          backgroundColor:'#0d0d18', borderColor:'#2a2a3e', borderWidth:1,
-          titleColor:'#5a5a7a', bodyColor:'#e8e8f0',
-          titleFont:{family:'DM Mono',size:9}, bodyFont:{family:'DM Mono',size:10},
-          callbacks:{
-            title:items=>items[0].label,
-            label:item=>{
-              if(item.datasetIndex===1) return ' Ref. 18-O: 0.847';
-              const v=item.raw, nivel=getNivel(v);
-              const ev=eventos.find(e=>e.index===item.dataIndex);
-              const lines=[` Coef: ${v.toFixed(3)}  ${nivel.label}`];
-              if(ev) lines.push(` Cambio detectado: ${ev.label}`);
-              return lines;
-            }
-          }
-        }
-      },
-      scales:{
-        x:{
-          ticks:{color:'#2a2a3e',font:{family:'DM Mono',size:8},maxTicksLimit:zoom==='semana'?7:zoom==='mes'?8:12,maxRotation:0},
-          grid:{color:'#1a1a28'}, border:{color:'#1a1a28'}
-        },
-        y:{
-          min:0, max:1,
-          ticks:{color:'#2a2a3e',font:{family:'DM Mono',size:8},stepSize:0.2,callback:v=>v.toFixed(1)},
-          grid:{color:'#1a1a28'}, border:{color:'#1a1a28'}
-        }
-      }
-    }
+/* ── TERMÓMETRO ── */
+function renderThermo(coef,nivel){
+  const svg=document.getElementById('thermoSvg');
+  const cx=50,tubeTop=12,tubeBottom=215,tubeH=tubeBottom-tubeTop;
+  const tubeW=22,bulbCy=252,bulbR=28;
+  const mercY=tubeBottom-coef*tubeH;
+  const mercH=tubeBottom-mercY;
+  const refY=tubeBottom-0.847*tubeH;
+  /* zona colors: verde(bottom)→amarillo→naranja→rojo(top) */
+  const zColors=["#1a7a4a","#4a9e5c","#e8a020","#e06010","#cc2200","#e82020"];
+  const zH=tubeH/6;
+  let h='';
+  h+=`<rect x="${cx-tubeW/2}" y="${tubeTop}" width="${tubeW}" height="${tubeH}" rx="11" fill="#ede0c4"/>`;
+  zColors.forEach((c,i)=>{
+    const zy=tubeBottom-zH*(i+1);
+    h+=`<rect x="${cx-tubeW/2+1}" y="${zy}" width="${tubeW-2}" height="${zH}" fill="${c}" opacity="0.2"/>`;
   });
-
-  // Etiquetas de eventos sobre el chart
-  requestAnimationFrame(()=>{
-    const annot=document.getElementById('chartAnnotations');
-    if(!annot) return;
-    annot.innerHTML=eventos.map(e=>{
-      const meta=chartInstance.getDatasetMeta(0).data[e.index];
-      if(!meta) return '';
-      return `<div style="position:absolute;left:${meta.x}px;top:${Math.max(4,meta.y-22)}px;transform:translateX(-50%);
-        background:#1a0808;border:1px solid #ff3b4e55;border-radius:4px;padding:2px 6px;
-        font-size:7px;color:#ff9966;white-space:nowrap;pointer-events:none;font-family:'DM Mono',monospace">
-        ${e.label}</div>`;
-    }).join('');
-  });
+  if(mercH>0){
+    h+=`<rect x="${cx-tubeW/2+4}" y="${mercY}" width="${tubeW-8}" height="${mercH+bulbR*0.65}" rx="5" fill="${nivel.color}"/>`;
+  }
+  h+=`<circle cx="${cx}" cy="${bulbCy}" r="${bulbR}" fill="#ede0c4"/>`;
+  h+=`<circle cx="${cx}" cy="${bulbCy}" r="${bulbR-3}" fill="${nivel.color}"/>`;
+  h+=`<circle cx="${cx-8}" cy="${bulbCy-8}" r="6" fill="#fff" opacity="0.15"/>`;
+  h+=`<rect x="${cx-tubeW/2}" y="${tubeTop}" width="${tubeW}" height="${tubeH}" rx="11" fill="none" stroke="${nivel.color}" stroke-width="1.5" opacity="0.45"/>`;
+  h+=`<circle cx="${cx}" cy="${bulbCy}" r="${bulbR}" fill="none" stroke="${nivel.color}" stroke-width="1.5" opacity="0.45"/>`;
+  /* marca 18-O */
+  h+=`<line x1="${cx+tubeW/2}" y1="${refY}" x2="${cx+tubeW/2+10}" y2="${refY}" stroke="#888888" stroke-width="1.5" stroke-dasharray="3,2"/>`;
+  h+=`<text x="${cx+tubeW/2+12}" y="${refY+4}" fill="#777777" font-size="7.5" font-family="sans-serif">18-O</text>`;
+  /* ticks */
+  for(let i=0;i<=4;i++){
+    const ty=tubeBottom-i*(tubeH/4);
+    const val=(i/4).toFixed(2).replace('.',',');
+    h+=`<line x1="${cx-tubeW/2-3}" y1="${ty}" x2="${cx-tubeW/2}" y2="${ty}" stroke="#cccccc" stroke-width="1"/>`;
+    h+=`<text x="${cx-tubeW/2-5}" y="${ty+4}" text-anchor="end" fill="#888888" font-size="7.5" font-family="sans-serif">${val}</text>`;
+  }
+  /* valor en bulbo */
+  h+=`<text x="${cx}" y="${bulbCy+5}" text-anchor="middle" fill="#fff" font-size="11" font-family="'Libre Baskerville',serif" font-weight="700">${coef.toFixed(2)}</text>`;
+  svg.innerHTML=h;
 }
 
-function setZoom(zoom){
-  zoomActual=zoom;
-  document.querySelectorAll('.zoom-tab').forEach(t=>t.classList.toggle('active',t.dataset.zoom===zoom));
-  renderChart(historialGlobal,zoom);
-}
-
-function renderVariables(data){
-  const vars=data.variables||{};
-  const filtradas=catActiva==='todas'?VARIABLES:VARIABLES.filter(v=>v.cat===catActiva);
-  const tipos={oficial:'src-oficial',encuesta:'src-encuesta',media:'src-media',rrss:'src-rrss'};
-  const labels={oficial:'OFICIAL',encuesta:'ENCUESTA',media:'PRENSA',rrss:'RRSS'};
-  return filtradas.map(v=>{
-    const dato=vars[v.id]||{};
-    const val=dato.valor!=null?dato.valor:v.ref2019;
-    const pct=((val-v.min)/(v.max-v.min)*100).toFixed(1);
-    const rPct=((v.ref2019-v.min)/(v.max-v.min)*100).toFixed(1);
-    const tc=tipos[dato.tipo_fuente]||'src-media';
-    const tl=labels[dato.tipo_fuente]||'FUENTE';
-    return `<div class="var-card">
-      <div class="var-top">
-        <div style="flex:1">
-          <span class="var-cat-pill" style="background:${v.color}18;color:${v.color};border:1px solid ${v.color}33">${v.cat.toUpperCase()}</span>
-          <div class="var-name">${v.label}</div>
-          <div class="var-desc">${v.desc}</div>
-        </div>
-        <div class="var-right">
-          <div class="var-val" style="color:${v.color}">${v.fmt(val)}</div>
-          <div class="var-ref">2019: ${v.fmt(v.ref2019)}</div>
-        </div>
-      </div>
-      <div class="var-track">
-        <div class="var-fill" style="width:${pct}%;background:linear-gradient(90deg,${v.color}44,${v.color})"></div>
-        <div class="var-ref-mark" style="left:${rPct}%"></div>
-      </div>
-      <div class="var-track-labels"><span>${v.fmt(v.min)}</span><span>${v.fmt(v.max)}</span></div>
-      ${dato.fuente?`<div class="var-source-row">
-        <span class="src-badge ${tc}">${tl}</span>
-        <span class="src-nombre">${dato.fuente}</span>
-        ${dato.fecha?`<span class="src-fecha">— ${dato.fecha}</span>`:''}
-      </div>`:''}
-      ${dato.nota?`<div class="var-nota">⚠ ${dato.nota}</div>`:''}
-    </div>`;
+/* ── ESCALA ── */
+function buildScale(nivel){
+  document.getElementById('scaleContainer').innerHTML=NIVELES.map(n=>{
+    const isActive=n.label===nivel.label;
+    return`<tr class="${isActive?'active-row':''}">
+      <td style="width:20px"><span class="scale-dot" style="background:${n.color};opacity:${isActive?1:0.5}"></span></td>
+      <td style="color:${isActive?n.color:'var(--ink3)'}">${n.label}</td>
+      <td class="scale-rango" style="color:${isActive?n.color:'var(--ink3)'}">${n.rango}</td>
+    </tr>`;
   }).join('');
 }
 
-function renderContrib(data){
-  const vars=data.variables||{};
-  return VARIABLES.map(v=>{
-    const dato=vars[v.id]||{};
-    const val=dato.valor!=null?dato.valor:v.ref2019;
-    let norm=(val-v.min)/(v.max-v.min);
-    if(v.inverso) norm=1-norm;
+/* ── SISMÓGRAFO ── */
+function genFakeData(days){
+  const pts=[];let v=0.38;
+  for(let i=0;i<days-1;i++){
+    v+=(Math.sin(i*0.4+days)*0.012)+(Math.random()-0.47)*0.022;
+    v=Math.max(0.20,Math.min(0.82,v));pts.push(v);
+  }
+  pts.push(lastCoef||0.42);return pts;
+}
+function renderSismo(coef){
+  const svg=document.getElementById('sismoSvg');
+  const W=260,H=110,pL=26,pR=32,pT=14,pB=18;
+  const iW=W-pL-pR,iH=H-pT-pB;
+  const pts=genFakeData(currentZoom);
+  const n=pts.length;
+  const xS=i=>pL+i*(iW/(n-1));
+  const yS=v=>pT+iH-(v*iH);
+  const nivel=getNivel(coef);
+  let h='';
+  [0.25,0.50,0.75].forEach(gv=>{
+    const gy=yS(gv);
+    h+=`<line x1="${pL}" y1="${gy}" x2="${W-pR}" y2="${gy}" stroke="#e8d8bc" stroke-width="1"/>`;
+    h+=`<text x="${pL-3}" y="${gy+3}" text-anchor="end" fill="#cccccc" font-size="7" font-family="sans-serif">${gv.toFixed(2).replace('.',',')}</text>`;
+  });
+  const refY=yS(0.847);
+  h+=`<line x1="${pL}" y1="${refY}" x2="${W-pR}" y2="${refY}" stroke="#888888" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>`;
+  h+=`<text x="${W-pR+2}" y="${refY+3}" fill="#777777" font-size="7" font-family="sans-serif">18-O</text>`;
+  const apts=pts.map((p,i)=>`${xS(i).toFixed(1)},${yS(p).toFixed(1)}`).join(' ');
+  h+=`<polygon points="${xS(0).toFixed(1)},${pT+iH} ${apts} ${xS(n-1).toFixed(1)},${pT+iH}" fill="${nivel.color}" opacity="0.07"/>`;
+  h+=`<polyline points="${apts}" fill="none" stroke="${nivel.color}" stroke-width="2" stroke-linejoin="round"/>`;
+  const lx=xS(n-1),ly=yS(coef);
+  h+=`<circle cx="${lx}" cy="${ly}" r="4" fill="${nivel.color}" stroke="#fff" stroke-width="1.5"/>`;
+  h+=`<text x="${lx}" y="${ly-8}" text-anchor="middle" fill="${nivel.color}" font-size="8" font-family="'Libre Baskerville',serif" font-weight="700">${coef.toFixed(3)}</text>`;
+  h+=`<text x="${pL}" y="${H-3}" fill="#cccccc" font-size="7" font-family="sans-serif">−${currentZoom===365?'365d':currentZoom===30?'30d':'7d'}</text>`;
+  h+=`<text x="${W-pR}" y="${H-3}" text-anchor="end" fill="#cccccc" font-size="7" font-family="sans-serif">hoy</text>`;
+  svg.innerHTML=h;
+}
+function setZoom(days){
+  currentZoom=days;
+  ['zoom7','zoom30','zoom365'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById(`zoom${days}`).classList.add('active');
+  if(lastCoef!==null)renderSismo(lastCoef);
+}
+
+/* ── CALCULAR ── */
+function calcular(){
+  let score=0,detalle={};
+  VARIABLES.forEach(v=>{
+    let norm=(valores[v.id]-v.min)/(v.max-v.min);
+    if(v.inverso)norm=1-norm;
     const contrib=norm*v.peso;
-    const pBar=(contrib/v.peso*100).toFixed(1);
-    return `<div class="contrib-row">
-      <div class="contrib-top">
-        <span class="contrib-label">${v.label.length>36?v.label.slice(0,36)+'…':v.label}</span>
-        <span style="color:${v.color};font-family:'DM Mono',monospace">${(contrib*100).toFixed(2)}%</span>
-      </div>
-      <div class="contrib-track"><div class="contrib-fill" style="width:${pBar}%;background:${v.color}"></div></div>
-    </div>`;
-  }).join('');
+    detalle[v.id]={norm,contrib};score+=contrib;
+  });
+  return{coef:Math.min(1,Math.max(0,score)),detalle};
 }
 
-function renderBias(data){
-  if(!data.fuentes_editoriales) return '';
-  const fe=data.fuentes_editoriales;
-  const total=(fe.derecha||0)+(fe.centro||0)+(fe.izquierda||0);
-  if(!total) return '';
-  const pD=((fe.derecha||0)/total*100).toFixed(0);
-  const pC=((fe.centro||0)/total*100).toFixed(0);
-  const pI=((fe.izquierda||0)/total*100).toFixed(0);
-  const fuentes=data.fuentes_usadas||[];
-  const tipos={oficial:'src-oficial',encuesta:'src-encuesta',media:'src-media',rrss:'src-rrss'};
-  const labels={oficial:'OFICIAL',encuesta:'ENCUESTA',media:'PRENSA',rrss:'RRSS'};
-  return `<div class="bias-section fade-in">
-    <div class="section-title">Balance Editorial</div>
-    <div class="bias-card">
-      <p style="color:var(--muted);font-size:9px;line-height:1.7">Fuentes consultadas por espectro editorial para reducir sesgo ideológico.</p>
-      <div class="bias-bar">
-        <div class="bias-seg" style="flex:${pD};background:#1d4ed8"></div>
-        <div class="bias-seg" style="flex:${pC};background:#4b5563"></div>
-        <div class="bias-seg" style="flex:${pI};background:#dc2626"></div>
-      </div>
-      <div class="bias-labels"><span>Derecha ${pD}%</span><span>Centro ${pC}%</span><span>Izquierda ${pI}%</span></div>
-      ${fuentes.length?`<div class="fuentes-list">${fuentes.map(f=>`<div class="fuente-item">
-        <div class="fuente-var">${f.variable||''}</div>
-        <div class="fuente-nom">${f.nombre||''}</div>
-        <span class="src-badge ${tipos[f.tipo]||'src-media'}">${labels[f.tipo]||'FUENTE'}</span>
-        ${f.fecha?`<span class="src-fecha"> ${f.fecha}</span>`:''}
-      </div>`).join('')}</div>`:''}
-    </div>
-  </div>`;
-}
-
-function renderAll(coefData, historial){
-  const coef=coefData.coeficiente, nivel=getNivel(coef);
-  const diff=coef-0.847;
-  document.getElementById('mainContent').innerHTML=`
-  <div class="hero fade-in ${coef>=0.85?'pulse':''}" style="border-color:${nivel.color}33">
-    <div class="hero-grid">
-      <div>
-        <div class="hero-fecha">${(coefData.fecha||'').toUpperCase()}</div>
-        <div class="hero-coef" style="color:${nivel.color}">${coef.toFixed(3)}</div>
-        <div class="hero-nivel" style="background:${nivel.color}18;border:1px solid ${nivel.color}44;color:${nivel.color}">${nivel.emoji} ${nivel.label}</div>
-        <p class="hero-desc">${nivel.desc}</p>
-      </div>
-      <div class="hero-right">
-        ${miniGaugeSVG(coef,nivel)}
-        <div class="dist-mini">
-          <div class="dist-mini-val" style="color:${diff>=0?'#ff3b4e':'#3ddc84'}">${diff>=0?'+':''}${diff.toFixed(3)}</div>
-          <div class="dist-mini-label">${diff>=0?'↑ más cerca':'↓ más lejos'}<br>del 18-O 2019</div>
+/* ── UPDATE PORTADA ── */
+function updatePortada(coef,detalle,showDetails){
+  const nivel=getNivel(coef);lastCoef=coef;
+  /* número grande — color del nivel */
+  document.getElementById('kickerCoef').textContent=coef.toFixed(3);
+  document.getElementById('kickerCoef').style.color=nivel.color;
+  document.getElementById('kickerNivel').textContent=nivel.label;
+  document.getElementById('kickerNivel').style.color=nivel.color;
+  document.getElementById('kickerDesc').textContent=nivel.desc;
+  document.getElementById('kickerBarFill').style.width=(coef*100)+'%';
+  document.getElementById('kickerBarFill').style.background=nivel.color;
+  document.getElementById('kickerUpdated').textContent=
+    'Actualizado: '+new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  renderThermo(coef,nivel);
+  renderSismo(coef);
+  buildScale(nivel);
+  const badge=document.getElementById('nivelBadge');
+  badge.textContent=nivel.label;
+  badge.style.background=nivel.color+'20';
+  badge.style.border=`1px solid ${nivel.color}60`;
+  badge.style.color=nivel.color;
+  document.getElementById('nivelDesc').textContent=nivel.desc;
+  document.getElementById('thermoBox').style.borderLeftColor=nivel.color;
+  document.getElementById('thermoBox').classList.toggle('pulse',coef>=0.85);
+  if(showDetails&&detalle){
+    const diff=coef-0.847;const pctD=Math.abs(diff/0.847*100);
+    document.getElementById('distVal').textContent=(diff>=0?'+':'')+diff.toFixed(3);
+    document.getElementById('distVal').style.color=diff>=0?'#e82020':'#1a7a4a';
+    document.getElementById('distLabel').style.color=diff>=0?'#e82020':'#1a7a4a';
+    document.getElementById('distLabel').textContent=diff>=0?'↑ Más cerca del estallido':'↓ Más lejos del estallido';
+    document.getElementById('distPct').textContent=`${pctD.toFixed(1)}% vs. 18-O 2019 (≈ 0,847)`;
+    document.getElementById('distCard').style.display='block';
+    document.getElementById('contribContainer').innerHTML=VARIABLES.map(v=>{
+      const d=detalle[v.id];const pBar=(d.contrib/v.peso*100).toFixed(1);
+      return`<div class="contrib-row">
+        <div class="contrib-header">
+          <span style="color:var(--ink3)">${v.label.length>36?v.label.slice(0,36)+'…':v.label}</span>
+          <span style="color:${v.catColor};font-family:var(--serif);font-weight:700">${(d.contrib*100).toFixed(2)}%</span>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="zoom-tabs fade-in">
-    <div class="zoom-tab ${zoomActual==='semana'?'active':''}" data-zoom="semana" onclick="setZoom('semana')">7 días</div>
-    <div class="zoom-tab ${zoomActual==='mes'?'active':''}" data-zoom="mes" onclick="setZoom('mes')">30 días</div>
-    <div class="zoom-tab ${zoomActual==='año'?'active':''}" data-zoom="año" onclick="setZoom('año')">1 año</div>
-  </div>
-
-  <div class="chart-card fade-in">
-    <div class="section-title">Evolución Histórica</div>
-    <div class="chart-wrap" id="chartWrap" style="position:relative">
-      <canvas id="chartCanvas"></canvas>
-      <div id="chartAnnotations" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none"></div>
-    </div>
-    <div class="chart-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#ff3b4e"></div> Coeficiente diario</div>
-      <div class="legend-item"><div class="legend-dash"></div> Ref. 18-O 2019 (0.847)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ff7b3a"></div> Cambio detectado</div>
-    </div>
-  </div>
-
-  <div class="cat-section fade-in">
-    <div class="section-title">Variables del Modelo</div>
-    <div class="cat-tabs">
-      <div class="cat-tab ${catActiva==='todas'?'active':''}" data-cat="todas" onclick="setCat('todas')">Todas</div>
-      <div class="cat-tab ${catActiva==='Económica'?'active':''}" data-cat="Económica" onclick="setCat('Económica')">Económica</div>
-      <div class="cat-tab ${catActiva==='Política'?'active':''}" data-cat="Política" onclick="setCat('Política')">Política</div>
-      <div class="cat-tab ${catActiva==='Social'?'active':''}" data-cat="Social" onclick="setCat('Social')">Social</div>
-    </div>
-    <div class="var-grid" id="varGrid">${renderVariables(coefData)}</div>
-  </div>
-
-  <div class="contrib-section fade-in">
-    <div class="section-title">Contribución por Variable</div>
-    ${renderContrib(coefData)}
-  </div>
-
-  ${renderBias(coefData)}
-
-  <div class="scale-section fade-in">
-    <div class="section-title">Escala de Riesgo</div>
-    ${NIVELES.map(n=>`<div class="scale-item ${n.label===nivel.label?'active':''}" style="border-left-color:${n.label===nivel.label?n.color:'transparent'};opacity:${n.label===nivel.label?1:0.35}">
-      <span style="color:${n.color}">${n.emoji} ${n.label}</span>
-      <span style="color:#2a2a3e;font-family:monospace">${n.rango}</span>
-    </div>`).join('')}
-  </div>
-
-  <button class="share-btn fade-in" onclick="shareWhatsApp(${coef})">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.852L0 24l6.336-1.51A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.373l-.36-.214-3.732.889.926-3.63-.235-.373A9.818 9.818 0 0112 2.182c5.422 0 9.818 4.396 9.818 9.818S17.422 21.818 12 21.818z"/></svg>
-    COMPARTIR POR WHATSAPP
-  </button>`;
-
-  requestAnimationFrame(()=>renderChart(historial,zoomActual));
-}
-
-function setCat(cat){
-  catActiva=cat;
-  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.toggle('active',t.dataset.cat===cat));
-  if(_coefDataGlobal) document.getElementById('varGrid').innerHTML=renderVariables(_coefDataGlobal);
-}
-
-function shareWhatsApp(coef){
-  const nivel=getNivel(coef), diff=coef-0.847;
-  const today=new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
-  const txt=`🌡 *Termómetro Social Chile*\n📅 ${today}\n\n`+
-    `📊 *Coeficiente: ${coef.toFixed(3)}*\n${nivel.emoji} Estado: *${nivel.label}*\n\n`+
-    `${diff>=0?'⬆':'⬇'} ${Math.abs((diff/0.847)*100).toFixed(1)}% ${diff>=0?'más cerca':'más lejos'} del 18-O 2019\n\n`+
-    `"${nivel.desc}"\n\n`+
-    `📡 _Datos en tiempo real · Fuentes de diverso espectro editorial_\n`+
-    `🔗 https://www.termometrosocial.cl\n`+
-    `_Escala: 0 = democracia estable · 1 = estallido social_`;
-  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
-}
-
-async function cargarDatos(){
-  const BASE='https://www.termometrosocial.cl';
-  try{
-    const[rCoef,rHist]=await Promise.all([
-      fetch(`${BASE}/data/coeficiente.json?t=${Date.now()}`),
-      fetch(`${BASE}/data/historial.json?t=${Date.now()}`)
-    ]);
-    if(!rCoef.ok) throw new Error(`HTTP ${rCoef.status}`);
-    const coefData=await rCoef.json();
-    historialGlobal=rHist.ok?await rHist.json():[];
-    _coefDataGlobal=coefData;
-    renderAll(coefData,historialGlobal);
-  }catch(err){
-    document.getElementById('mainContent').innerHTML=`
-      <div class="error-box">
-        <strong>⚠ Datos no disponibles</strong><br><br>
-        El sistema se actualiza diariamente a las 08:00 AM (Chile).<br>
-        Si acabas de publicar el sitio, espera la primera actualización automática.<br><br>
-        <span style="color:#4a1a1a">Error: ${err.message}</span>
+        <div class="contrib-track"><div class="contrib-fill" style="width:${pBar}%;background:${v.catColor}"></div></div>
       </div>`;
+    }).join('');
+    document.getElementById('contribCard').style.display='block';
+    const srcs=VARIABLES.filter(v=>fuentes[v.id])
+      .map(v=>`<div style="padding:3px 0;border-bottom:1px solid var(--rule2)">▸ <strong style="color:var(--ink)">${v.label}</strong><br><span style="padding-left:10px;color:var(--ink3)">${fuentes[v.id]}</span></div>`).join('');
+    if(srcs){document.getElementById('dataSourceCard').style.display='block';document.getElementById('dataSourceList').innerHTML=srcs}
   }
 }
 
-cargarDatos();
+/* ── TABLA METODOLOGÍA ── */
+function buildVarTable(){
+  document.getElementById('varTableBody').innerHTML=VARIABLES.map(v=>`
+    <tr>
+      <td style="font-size:var(--text-sm);color:var(--ink)">${v.label}</td>
+      <td><span class="cat-badge" style="background:${v.catBg};color:${v.catColor}">${v.cat.toUpperCase()}</span></td>
+      <td><span class="peso-val" style="color:${v.catColor}">${(v.peso*100).toFixed(0)}%</span></td>
+      <td><span class="ref-val">${v.fmt(v.ref2019)}</span></td>
+    </tr>`).join('');
+  document.getElementById('baselineRows').innerHTML=VARIABLES.map(v=>`
+    <div class="baseline-row">
+      <span class="baseline-label">${v.label}</span>
+      <span class="baseline-val">${v.fmt(v.ref2019)}</span>
+    </div>`).join('');
+}
+
+/* ── AI PANEL ── */
+function togglePanel(){
+  panelOpen=!panelOpen;
+  document.getElementById('aiBody').style.display=panelOpen?'block':'none';
+  document.getElementById('aiChevron').textContent=panelOpen?'▼':'▶';
+}
+function log(msg,type=''){
+  const el=document.getElementById('aiLog');el.classList.add('visible');
+  const l=document.createElement('div');l.className='log-line '+type;l.textContent=msg;
+  el.appendChild(l);el.scrollTop=el.scrollHeight;
+}
+function clearLog(){document.getElementById('aiLog').innerHTML='';document.getElementById('aiLog').classList.remove('visible');document.getElementById('sourcesRow').innerHTML=''}
+function setDot(s){document.getElementById('aiDot').className='update-signal'+(s?' '+s:'')}
+
+async function actualizarConIA(){
+  const apiKey=document.getElementById('apiKey').value.trim();
+  if(!apiKey||!apiKey.startsWith('sk-ant')){alert('⚠️ Ingresa una API Key válida de Anthropic (comienza con sk-ant-)');return}
+  const btn=document.getElementById('btnActualizar');
+  btn.disabled=true;btn.textContent='⏳ BUSCANDO...';
+  setDot('active');clearLog();
+  const today=new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
+  log(`▸ Iniciando búsqueda — ${today}`,'search');
+  log(`▸ Consultando fuentes conservadoras, progresistas y centro...`,'search');
+  const prompt=`Hoy es ${today}. Eres un analista experto en datos socioeconómicos y políticos de Chile. Usa la herramienta de búsqueda web para encontrar los datos más recientes. Consulta fuentes de distintas orientaciones: Oficiales (INE, BCCh), conservadoras (El Mercurio, La Tercera, Radio Bío-Bío, Cadem/CEP), progresistas (El Mostrador, The Clinic, El Desconcierto, CERC-MORI), centro (CNN Chile, Radio Cooperativa, IPSOS, Activa Research). Prioriza siempre fuentes oficiales. Variables: 1. gini (0.25-0.65), 2. costo_vida_percepcion (20-100), 3. desempleo (2-25), 4. aprobacion_gobierno (5-80), 5. confianza_congreso (3-70), 6. movilizacion_social (1-10), 7. percepcion_abuso (5-95), 8. fragmentacion_politica (2-20). Retorna ÚNICAMENTE JSON puro sin markdown: {"fecha_consulta":"${today}","datos":{"gini":{"valor":0.0,"fuente":"","fecha":"","nota":""},"costo_vida_percepcion":{"valor":0,"fuente":"","fecha":"","nota":""},"desempleo":{"valor":0.0,"fuente":"","fecha":"","nota":""},"aprobacion_gobierno":{"valor":0,"fuente":"","fecha":"","nota":""},"confianza_congreso":{"valor":0,"fuente":"","fecha":"","nota":""},"movilizacion_social":{"valor":0.0,"fuente":"","fecha":"","nota":""},"percepcion_abuso":{"valor":0,"fuente":"","fecha":"","nota":""},"fragmentacion_politica":{"valor":0.0,"fuente":"","fecha":"","nota":""}}}`;
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2500,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]})
+    });
+    if(!response.ok){const err=await response.json().catch(()=>({}));throw new Error(err?.error?.message||`HTTP ${response.status}`)}
+    const data=await response.json();
+    log(`▸ Respuesta recibida. Procesando...`,'data');
+    const fullText=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+    let jsonStr=fullText;
+    const m=fullText.match(/\{[\s\S]*"datos"[\s\S]*?\}[\s\S]*?\}/);
+    if(m)jsonStr=m[0];
+    jsonStr=jsonStr.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(jsonStr);
+    const datos=parsed.datos;
+    if(!datos)throw new Error('Formato de respuesta inesperado.');
+    const keyMap={gini:'gini',costo_vida_percepcion:'costo',desempleo:'desempleo',aprobacion_gobierno:'conf_gob',confianza_congreso:'conf_cong',movilizacion_social:'movilizacion',percepcion_abuso:'abuso',fragmentacion_politica:'frag'};
+    let updated=0;const srcs=[];
+    for(const[aiKey,varId]of Object.entries(keyMap)){
+      const dato=datos[aiKey];if(!dato||dato.valor==null)continue;
+      const v=VARIABLES.find(x=>x.id===varId);if(!v)continue;
+      let val=parseFloat(dato.valor);if(isNaN(val)||val===0)continue;
+      val=Math.min(v.max,Math.max(v.min,val));
+      valores[varId]=val;fuentes[varId]=dato.fuente||'Fuente no especificada';
+      log(`  ✓ ${v.label}: ${v.fmt(val)}  ←  ${dato.fuente}`,'data');
+      if(dato.fuente)srcs.push(dato.fuente);
+      updated++;
+    }
+    document.getElementById('sourcesRow').innerHTML=[...new Set(srcs)].map(s=>`<span class="source-chip">${s}</span>`).join('');
+    log('','');log(`✅ ${updated}/8 variables actualizadas.`,'done');
+    if(updated<8)log(`⚠️ Variables restantes conservan valores de referencia 2019.`,'warn');
+    const{coef,detalle}=calcular();
+    updatePortada(coef,detalle,true);
+    setDot('');btn.textContent=`✓ ACTUALIZADO (${updated}/8)`;
+    btn.style.background='#1a7a4a';
+    setTimeout(()=>{btn.textContent='⚡ ACTUALIZAR';btn.style.background='';btn.disabled=false},4000);
+  }catch(err){
+    setDot('error');log(`✗ Error: ${err.message}`,'err');
+    if(err.message.includes('401')||err.message.includes('auth'))log(`  → API Key inválida o expirada.`,'warn');
+    else if(err.message.includes('529'))log(`  → API sobrecargada, intenta en unos segundos.`,'warn');
+    else log(`  → Verifica tu clave y que tengas créditos disponibles.`,'warn');
+    btn.disabled=false;btn.textContent='⚡ ACTUALIZAR';
+  }
+}
+
+/* ── SHARE ── */
+document.getElementById('btnShare').onclick=()=>{
+  const coef=lastCoef;
+  if(!coef){alert('Esperando datos...');return}
+  const nivel=getNivel(coef);const diff=coef-0.847;
+  const today=new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
+  const hasReal=VARIABLES.some(v=>fuentes[v.id]);
+  const txt=`📊 *Termómetro Social Chile 2026*\n📅 ${today}\n\n*Coeficiente: ${coef.toFixed(3)}*\n▶ Estado: *${nivel.label}*\n\n`+
+    `${diff>=0?'↑':'↓'} ${Math.abs((diff/0.847)*100).toFixed(1)}% ${diff>=0?'más cerca':'más lejos'} del 18-O 2019\n\n`+
+    `"${nivel.desc}"\n`+(hasReal?`\n_Variables ajustadas con datos reales en tiempo real_\n`:'')+
+    `\n_Escala: 0 = democracia estable · 1 = estallido social_`;
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+};
+
+/* ── INIT ── */
+buildVarTable();
+const{coef:c0,detalle:d0}=calcular();
+updatePortada(c0,d0,false);
 </script>
 </body>
 </html>
