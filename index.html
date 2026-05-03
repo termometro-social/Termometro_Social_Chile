@@ -399,14 +399,7 @@ body{
         </div>
       </div>
     </div>
-    <div class="result-card" id="contribCard" style="display:none">
-      <div class="result-label">CONTRIBUCIÓN POR VARIABLE</div>
-      <div id="contribContainer"></div>
-    </div>
-    <div class="result-card" id="dataSourceCard" style="display:none">
-      <div class="result-label">FUENTES CONSULTADAS HOY</div>
-      <div id="dataSourceList" style="font-size:var(--text-sm);color:var(--ink3);line-height:2.2"></div>
-    </div>
+
   </div>
 
   <!-- WHATSAPP -->
@@ -424,26 +417,6 @@ body{
       <div class="metod-link-sub">Variables, ponderaciones, fuentes y corrección de sesgo ideológico</div>
     </div>
     <div class="metod-link-arrow">→</div>
-  </div>
-
-  <!-- AI UPDATE -->
-  <div class="update-panel">
-    <div class="update-header" onclick="togglePanel()">
-      <div class="update-signal" id="aiDot"></div>
-      <span class="update-title">ACTUALIZAR CON DATOS EN TIEMPO REAL</span>
-      <span class="update-badge">IA + WEB</span>
-      <span id="aiChevron" class="update-chevron">▼</span>
-    </div>
-    <div class="update-body" id="aiBody">
-      <p class="update-desc">Ingresa tu <em>API Key de Anthropic</em> para que la IA consulte fuentes chilenas actuales y actualice las variables a hoy.</p>
-      <div class="key-row">
-        <input type="password" class="key-input" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off">
-        <button class="btn-update" id="btnActualizar" onclick="actualizarConIA()">⚡ ACTUALIZAR</button>
-      </div>
-      <p class="privacy">🔒 La clave se usa solo para llamar a api.anthropic.com desde tu navegador. No se almacena.</p>
-      <div class="ai-log" id="aiLog"></div>
-      <div class="sources-row" id="sourcesRow"></div>
-    </div>
   </div>
 
   <div class="footer">
@@ -471,7 +444,7 @@ body{
     <p class="metod-body">Cada variable pertenece a uno de tres ámbitos: <em>económico</em> (desigualdad, costo de vida, desempleo), <em>político</em> (confianza institucional, fragmentación) y <em>social</em> (movilización, percepción de abuso).</p>
 
     <table class="var-table">
-      <thead><tr><th>VARIABLE</th><th>ÁMBITO</th><th>PESO</th><th>REF. 2019</th></tr></thead>
+      <thead><tr><th>VARIABLE</th><th>ÁMBITO</th><th>PESO</th><th>REF. 2019</th><th>HOY</th></tr></thead>
       <tbody id="varTableBody"></tbody>
     </table>
 
@@ -799,27 +772,39 @@ function updatePortada(coef,detalle,showDetails){
         <div class="contrib-track"><div class="contrib-fill" style="width:${pBar}%;background:${v.catColor}"></div></div>
       </div>`;
     }).join('');
-    document.getElementById('contribCard').style.display='block';
-    const srcs=VARIABLES.filter(v=>fuentes[v.id])
-      .map(v=>`<div style="padding:3px 0;border-bottom:1px solid var(--rule2)">▸ <strong style="color:var(--ink)">${v.label}</strong><br><span style="padding-left:10px;color:var(--ink3)">${fuentes[v.id]}</span></div>`).join('');
-    if(srcs){document.getElementById('dataSourceCard').style.display='block';document.getElementById('dataSourceList').innerHTML=srcs}
+    /* Actualizar columna HOY en tabla de metodología */
+    updateVarTableHoy(detalle);
   }
 }
 
 /* ── TABLA METODOLOGÍA ── */
 function buildVarTable(){
   document.getElementById('varTableBody').innerHTML=VARIABLES.map(v=>`
-    <tr>
+    <tr id="varrow_${v.id}">
       <td style="font-size:var(--text-sm);color:var(--ink)">${v.label}</td>
       <td><span class="cat-badge" style="background:${v.catBg};color:${v.catColor}">${v.cat.toUpperCase()}</span></td>
       <td><span class="peso-val" style="color:${v.catColor}">${(v.peso*100).toFixed(0)}%</span></td>
       <td><span class="ref-val">${v.fmt(v.ref2019)}</span></td>
+      <td id="hoy_${v.id}" style="font-family:var(--serif);font-size:var(--text-md);color:var(--ink3)">—</td>
     </tr>`).join('');
   document.getElementById('baselineRows').innerHTML=VARIABLES.map(v=>`
     <div class="baseline-row">
       <span class="baseline-label">${v.label}</span>
       <span class="baseline-val">${v.fmt(v.ref2019)}</span>
     </div>`).join('');
+}
+
+/* ── ACTUALIZAR COLUMNA HOY EN TABLA ── */
+function updateVarTableHoy(detalle){
+  VARIABLES.forEach(v=>{
+    const el=document.getElementById(`hoy_${v.id}`);
+    if(!el) return;
+    const val=valores[v.id];
+    const d=detalle[v.id];
+    /* Mostrar valor actual + contribución */
+    const contrib=(d.contrib*100).toFixed(1);
+    el.innerHTML=`<span style="color:${v.catColor};font-weight:700">${v.fmt(val)}</span><br><span style="font-size:9px;color:var(--ink3)">${contrib}%</span>`;
+  });
 }
 
 /* ── AI PANEL ── */
