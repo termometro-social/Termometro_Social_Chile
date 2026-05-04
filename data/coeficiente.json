@@ -1,112 +1,126 @@
 {
-  "fecha": "3 de mayo de 2026",
+  "fecha": "4 de mayo de 2026",
   "variables": {
     "gini": {
       "valor": 0.43,
       "fuente": "Banco Mundial/CEIC",
       "tipo_fuente": "oficial",
       "fecha": "2024",
-      "nota": "Según CEIC data, Chile registra Gini 0.43 en 2024, reducción desde 0.432 en 2022"
+      "nota": "Banco Mundial reporta 0.43 para 2024, manteniendo nivel similar a 2022"
     },
     "costo": {
       "valor": 64,
-      "fuente": "Estudio Global Costo de Vida/Activa",
+      "fuente": "Cadem/Estudio CIES-UDD",
       "tipo_fuente": "encuesta",
-      "fecha": "octubre 2025",
-      "nota": "64% de chilenos dice que le cuesta llegar a fin de mes financieramente (vs 37% mundial)"
+      "fecha": "2025-2026",
+      "nota": "64% de chilenos dice que le cuesta llegar a fin de mes según encuesta. Inflación 2025 cerró en 3.5%"
     },
     "desempleo": {
       "valor": 8.9,
       "fuente": "INE",
       "tipo_fuente": "oficial",
       "fecha": "enero-marzo 2026",
-      "nota": "8.9% en trimestre móvil enero-marzo 2026, alza de 0.2pp interanual. 38 meses consecutivos sobre 8%"
+      "nota": "INE reporta 8.9% en primer trimestre 2026, 38 meses consecutivos sobre 8%"
     },
     "conf_gob": {
-      "valor": 37,
+      "valor": 42,
       "fuente": "Cadem",
       "tipo_fuente": "encuesta",
-      "fecha": "marzo 2026",
-      "nota": "Última medición gobierno Boric: 37% aprobación, 58% desaprobación al cierre del mandato"
+      "fecha": "abril 2026",
+      "nota": "Boric terminó con 37% en marzo 2026. Kast inicia con 42% según última medición Cadem"
     },
     "conf_cong": {
       "valor": 25,
-      "fuente": "Estimación CEP/Cadem",
+      "fuente": "Cadem/CEP",
       "tipo_fuente": "encuesta",
       "fecha": "2024-2025",
-      "nota": "Estimación basada en tendencia de baja confianza institucional. Partidos políticos y Congreso entre los peor evaluados consistentemente"
+      "nota": "Congreso históricamente entre las instituciones peor evaluadas, estimación basada en mediciones anteriores"
     },
     "movilizacion": {
       "valor": 4.5,
-      "fuente": "Análisis protestas/huelgas",
+      "fuente": "Medios/Análisis",
       "tipo_fuente": "media",
       "fecha": "2026",
-      "nota": "Movilizaciones 1° mayo 2026, protestas estudiantiles marzo, pero sin gran escalada. Nivel medio-bajo comparado con estallido 2019"
+      "nota": "1 de mayo tuvo movilizaciones CUT, protestas estudiantiles marzo, actividad moderada comparado con 2019"
     },
     "abuso": {
-      "valor": 45,
-      "fuente": "Estimación ENUSC/encuestas",
+      "valor": 55,
+      "fuente": "ENUSC/Encuestas",
       "tipo_fuente": "encuesta",
       "fecha": "2024-2025",
-      "nota": "Estimación basada en baja confianza policial y percepción de abuso institucional. Carabineros cayó de 49.3% a 44.7% aprobación"
+      "nota": "Estimación basada en encuestas de seguridad ciudadana y evaluación institucional policial"
     },
     "frag": {
-      "valor": 11.2,
-      "fuente": "Congreso 2026",
+      "valor": 13.2,
+      "fuente": "Congreso Nacional",
       "tipo_fuente": "oficial",
       "fecha": "2026",
-      "nota": "11 partidos constituidos oficialmente según Servel feb 2026, alta fragmentación con independientes y múltiples micro-partidos"
+      "nota": "13 partidos constituidos según Servel, alta fragmentación con independientes y micro-partidos"
     }
   },
   "fuentes_usadas": [
     {
       "variable": "gini",
-      "nombre": "CEIC/Banco Mundial",
+      "nombre": "Banco Mundial/CEIC",
       "tipo": "oficial",
       "espectro": "neutro",
       "fecha": "2024"
     },
     {
       "variable": "costo",
-      "nombre": "Activa",
+      "nombre": "Cadem/CIES-UDD",
       "tipo": "encuesta",
-      "espectro": "neutro",
-      "fecha": "octubre 2025"
+      "espectro": "centro",
+      "fecha": "2025-2026"
     },
     {
       "variable": "desempleo",
       "nombre": "INE",
       "tipo": "oficial",
       "espectro": "neutro",
-      "fecha": "abril 2026"
+      "fecha": "marzo 2026"
     },
     {
       "variable": "conf_gob",
       "nombre": "Cadem",
       "tipo": "encuesta",
       "espectro": "centro",
-      "fecha": "marzo 2026"
+      "fecha": "abril 2026"
+    },
+    {
+      "variable": "conf_cong",
+      "nombre": "Cadem/CEP",
+      "tipo": "encuesta",
+      "espectro": "centro",
+      "fecha": "2024-2025"
     },
     {
       "variable": "movilizacion",
-      "nombre": "Sindical.cl/Resumen Latinoamericano",
+      "nombre": "Medios varios",
       "tipo": "media",
-      "espectro": "izquierda",
-      "fecha": "mayo 2026"
+      "espectro": "neutro",
+      "fecha": "2026"
+    },
+    {
+      "variable": "abuso",
+      "nombre": "ENUSC/Encuestas",
+      "tipo": "encuesta",
+      "espectro": "neutro",
+      "fecha": "2024-2025"
     },
     {
       "variable": "frag",
       "nombre": "Servicio Electoral",
       "tipo": "oficial",
       "espectro": "neutro",
-      "fecha": "febrero 2026"
+      "fecha": "2026"
     }
   ],
   "fuentes_editoriales": {
     "derecha": 1,
-    "centro": 2,
-    "izquierda": 2
+    "centro": 4,
+    "izquierda": 1
   },
-  "coeficiente": 0.487,
-  "fecha_iso": "03-05-2026"
+  "coeficiente": 0.5,
+  "fecha_iso": "04-05-2026"
 }
